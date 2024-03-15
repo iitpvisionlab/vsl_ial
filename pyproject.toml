@@ -1,0 +1,18 @@
+[project]
+name = "vsl_ial"
+version = "0.0.1"
+authors = [
+  { name="Arseniy Terekhin", email="senyai@gmail.com" },
+  { name="Dmitry Nikolaev" },
+  { name="Olga Basova" },
+  { name="Valerii Timofeev" },
+]
+description = "Color spaces made reasonable"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+[tool.black]
+line-length = 79
