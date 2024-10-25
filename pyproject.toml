@@ -8,7 +8,7 @@ authors = [
   { name="Valerii Timofeev" },
 ]
 description = "Color spaces made reasonable"
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -16,3 +16,4 @@ classifiers = [
 ]
 [tool.black]
 line-length = 79
+target-version = ["py310"]
