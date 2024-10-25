@@ -86,7 +86,9 @@ class CIELAB(CS):
         ΔC_ab = C_ab_1 - C_ab_2
         Δa = a1 - a2
         Δb = b1 - b2
-        ΔH = np.sqrt(np.square(Δa) + np.square(Δb) - np.square(ΔC_ab))
+        ΔH = np.sqrt(
+            (np.square(Δa) + np.square(Δb) - np.square(ΔC_ab)).clip(min=0.0)
+        )
         SL = 1.0
         # C_ab_x = np.sqrt(C_ab_1 * C_ab_2)
         SC = 1.0 + 0.045 * C_ab_1
