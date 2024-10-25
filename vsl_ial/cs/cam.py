@@ -124,11 +124,11 @@ class CAMCommon(CS):
     def _response_inv(self, color: FArray) -> FArray:
         pass
 
-    def _from_XYZ(self, src: CS, color: FArray) -> FArray:
+    def from_XYZ(self, src: CS, color: FArray) -> FArray:
         rgb_a_, A = self._postadaptation_cone_response(color)
         return self._calculate_jmh(rgb_a_, A).reshape(color.shape)
 
-    def _to_XYZ(self, dst: CS, color: FArray) -> FArray:
+    def to_XYZ(self, dst: CS, color: FArray) -> FArray:
         """Input: J; M; h"""
         J, M, h = color.T
         cos_h = np.cos(h)
@@ -275,13 +275,13 @@ class _CAMBase(CS):
     ):
         self._cam16 = CAM16(illuminant_xyz, L_A, Y_b, surround)
 
-    def _from_XYZ(self, src: CS, color: FArray) -> FArray:
+    def from_XYZ(self, src: CS, color: FArray) -> FArray:
         J, M, h = convert(src, self._cam16, color).T
         M_ = np.log(1 + self.c2 * M) / self.c2
         J_ = 1.7 * J / (1 + self.c1 * J)
         return np.array([J_, M_ * np.cos(h), M_ * np.sin(h)]).T
 
-    def _to_XYZ(self, dst: CS, color: FArray):
+    def to_XYZ(self, dst: CS, color: FArray):
         J_, a, b = color.T
         J = -J_ / (self.c1 * (J_ - 1) - 1)
         h = np.mod(np.arctan2(b, a), np.pi * 2.0)

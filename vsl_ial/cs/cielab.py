@@ -59,10 +59,10 @@ class CIELAB(CS):
         assert illuminant_xyz is not None
         super().__init__(illuminant_xyz)
 
-    def _from_XYZ(self, src: CS, color: FArray):
+    def from_XYZ(self, src: CS, color: FArray):
         return np.tensordot(f(color / self._illuminant_xyz), self.A, axes=1)
 
-    def _to_XYZ(self, dst: CS, color: FArray):
+    def to_XYZ(self, dst: CS, color: FArray):
         return (
             finv(np.tensordot(color, self.Ainv, axes=1)) * self._illuminant_xyz
         )

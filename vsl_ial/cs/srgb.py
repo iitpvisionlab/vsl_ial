@@ -8,7 +8,7 @@ from .xyz import XYZ
 
 
 class sRGB(CS):
-    def _from_linRGB(self, src: CS, color: FArray) -> FArray:
+    def from_linRGB(self, src: CS, color: FArray) -> FArray:
         assert src.__class__.__name__ == "linRGB"
         thres = 0.0031308
         a = 0.055
@@ -31,13 +31,13 @@ class sRGB(CS):
 
         return color_clipped
 
-    def _from_XYZ(self, src: CS, color: FArray) -> FArray:
+    def from_XYZ(self, src: CS, color: FArray) -> FArray:
         assert src.__class__.__name__ == "XYZ"
         linrgb = linRGB(self._illuminant_xyz)
-        color = linrgb._from_XYZ(src, color)
-        return self._from_linRGB(linrgb, color)
+        color = linrgb.from_XYZ(src, color)
+        return self.from_linRGB(linrgb, color)
 
-    def _to_XYZ(self, src: CS, color: FArray) -> FArray:
+    def to_XYZ(self, src: CS, color: FArray) -> FArray:
         color_linRGB = convert(sRGB(), linRGB(), color=color)
         return convert(
             linRGB(illuminant_xyz=self._illuminant_xyz),

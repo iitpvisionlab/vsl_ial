@@ -41,12 +41,12 @@ LMS_TO_LAB_INV = np.asarray(
 
 
 class Oklab(CS):
-    def _from_XYZ(self, src: CS, color: FArray) -> FArray:
+    def from_XYZ(self, src: CS, color: FArray) -> FArray:
         lms = np.tensordot(color, XYZ_TO_LMS, axes=1)
         lms_cubic_root = np.cbrt(lms)
         return np.tensordot(lms_cubic_root, LMS_TO_LAB, axes=1)
 
-    def _to_XYZ(self, src: CS, color: FArray) -> FArray:
+    def to_XYZ(self, src: CS, color: FArray) -> FArray:
         lab = np.tensordot(color, LMS_TO_LAB_INV, axes=1)
         lab_cube = lab**3.0
         return np.tensordot(lab_cube, XYZ_TO_LMS_INV, axes=1)

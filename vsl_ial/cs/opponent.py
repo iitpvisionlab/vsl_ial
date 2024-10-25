@@ -30,8 +30,8 @@ class Opponent(CS):
         assert illuminant_xyz is None
         super().__init__(illuminant_xyz)
 
-    def _from_XYZ(self, src: CS, color: FArray) -> FArray:
+    def from_XYZ(self, src: CS, color: FArray) -> FArray:
         return np.tensordot(color, self.M, axes=1)
 
-    def _to_XYZ(self, src: CS, color: FArray) -> FArray:
+    def to_XYZ(self, src: CS, color: FArray) -> FArray:
         return np.tensordot(color, self.Minv, axes=1)

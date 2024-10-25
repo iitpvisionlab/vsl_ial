@@ -43,10 +43,10 @@ class CS:
 
     def convert(self, src: CS, color: FArray) -> FArray:
         try:
-            from_func = getattr(self, f"_from_{src.__class__.__name__}")
+            from_func = getattr(self, f"from_{src.__class__.__name__}")
         except AttributeError:
             try:
-                to_func = getattr(src, f"_to_{self.__class__.__name__}")
+                to_func = getattr(src, f"to_{self.__class__.__name__}")
             except AttributeError:
                 type_self = self.__class__
 
