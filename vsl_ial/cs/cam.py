@@ -1,6 +1,7 @@
 """
 Comprehensive color solutions: CAM16, CAT16, and CAM16-UCS
 """
+
 from __future__ import annotations
 from abc import abstractmethod
 from . import CS, convert, FArray
@@ -11,47 +12,52 @@ import numpy as np
 
 # 1. Li et al. (2017) Comprehensive colour solutions: CAM16, CAT16 and CAM16-UCS
 # 2. Green & Habib (2019) Chromatic adaptation in colour management
-M_16 = np.asfarray(
-    [
-        [+0.401288, +0.650173, -0.051461],
-        [-0.250268, +1.204414, +0.045854],
-        [-0.002079, +0.048952, +0.953127],
-    ]
+M_16 = np.asarray(
+    (
+        (+0.401288, +0.650173, -0.051461),
+        (-0.250268, +1.204414, +0.045854),
+        (-0.002079, +0.048952, +0.953127),
+    ),
+    dtype=np.float64,
 )
 
 # 1. Li et al. (2017) Comprehensive colour solutions: CAM16, CAT16 and CAM16-UCS
-M_16_INV = np.asfarray(
-    [
-        [+1.86206786, -1.01125463, +0.14918677],
-        [+0.38752654, +0.62144744, -0.00897398],
-        [-0.01584150, -0.03412294, +1.04996444],
-    ]
+M_16_INV = np.asarray(
+    (
+        (+1.86206786, -1.01125463, +0.14918677),
+        (+0.38752654, +0.62144744, -0.00897398),
+        (-0.01584150, -0.03412294, +1.04996444),
+    ),
+    dtype=np.float64,
 )
 
 
-M_CAT02 = np.asfarray(
-    [
-        [+0.7328, +0.4296, -0.1624],
-        [-0.7036, +1.6975, +0.0061],
-        [+0.0030, +0.0136, +0.9834],
-    ]
+M_CAT02 = np.asarray(
+    (
+        (+0.7328, +0.4296, -0.1624),
+        (-0.7036, +1.6975, +0.0061),
+        (+0.0030, +0.0136, +0.9834),
+    ),
+    dtype=np.float64,
 )
 
 
-M_CAT02_INV = np.asfarray(
-    [
-        [+1.096124, -0.278869, 0.182745],
-        [+0.454369, +0.473533, 0.072098],
-        [-0.009628, -0.005698, 1.015326],
-    ]
+M_CAT02_INV = np.asarray(
+    (
+        (+1.096124, -0.278869, 0.182745),
+        (+0.454369, +0.473533, 0.072098),
+        (-0.009628, -0.005698, 1.015326),
+    ),
+    dtype=np.float64,
 )
 
-M_HPE = np.array(
-    [
-        [+0.38971, +0.68898, -0.07868],
-        [-0.22981, +1.18340, +0.04641],
-        [+0.00000, +0.00000, +1.00000],
-    ]
+M_HPE = np.asarray(
+    (
+        (+0.38971, +0.68898, -0.07868),
+        (-0.22981, +1.18340, +0.04641),
+        (+0.00000, +0.00000, +1.00000),
+    ),
+    dtype=np.float64,
 )
 
 
@@ -72,7 +78,11 @@ Dark = Surround(0.8, 0.525, 0.8)
 
 class CAMCommon(CS):
     RGB_a_coefs = (
-        np.asfarray(((460, +451, +288), (460, -891, -261), (460, -220, -6300))) / 1403
+        np.asarray(
+            ((460, +451, +288), (460, -891, -261), (460, -220, -6300)),
+            dtype=np.float64,
+        )
+        / 1403
     )
     M: FArray
 
@@ -114,9 +124,7 @@ class CAMCommon(CS):
     def _response_inv(self, color: FArray) -> FArray:
         pass
 
-    def _from_XYZ(
-        self, src: CS, color: FArray
-    ) -> FArray:
+    def _from_XYZ(self, src: CS, color: FArray) -> FArray:
         rgb_a_, A = self._postadaptation_cone_response(color)
         return self._calculate_jmh(rgb_a_, A).reshape(color.shape)
 
@@ -133,15 +141,22 @@ class CAMCommon(CS):
         A = self.A_w * J_root ** (2 / self.surround.c / z)
         p_1 = 5e4 / 13 * self.surround.N_c * self.N_cb * e_t
         p_2 = A / self.N_bb
-        r = 23 * (p_2 + 0.305) * t / (23 * p_1 + t * (11 * cos_h + 108 * sin_h))
+        r = (
+            23
+            * (p_2 + 0.305)
+            * t
+            / (23 * p_1 + t * (11 * cos_h + 108 * sin_h))
+        )
         a = r * cos_h
         b = r * sin_h
 
-        RGB_a = np.asfarray([p_2, a, b]).T @ self.RGB_a_coefs.T
+        RGB_a = np.asarray([p_2, a, b]).T @ self.RGB_a_coefs.T
         RGB_a_abs = np.abs(RGB_a)
         constant = 1.0 / self.F_L * 27.13 ** (1.0 / 0.42)
         RGB_c = (
-            np.sign(RGB_a) * constant * (RGB_a_abs / (400.0 - RGB_a_abs)) ** (1.0 / 0.42)
+            np.sign(RGB_a)
+            * constant
+            * (RGB_a_abs / (400.0 - RGB_a_abs)) ** (1.0 / 0.42)
         )
         return self._response_inv(RGB_c)
 
@@ -186,7 +201,7 @@ class CAMCommon(CS):
             / t_denum
         )
 
-        C = t**0.9 * J ** 0.5 * (1.64 - 0.29**self.n) ** 0.73
+        C = t**0.9 * J**0.5 * (1.64 - 0.29**self.n) ** 0.73
 
         M = C * self.F_L_root4 * 0.01
 
@@ -260,9 +275,7 @@ class _CAMBase(CS):
     ):
         self._cam16 = CAM16(illuminant_xyz, L_A, Y_b, surround)
 
-    def _from_XYZ(
-        self, src: CS, color: FArray
-    ) -> FArray:
+    def _from_XYZ(self, src: CS, color: FArray) -> FArray:
         J, M, h = convert(src, self._cam16, color).T
         M_ = np.log(1 + self.c2 * M) / self.c2
         J_ = 1.7 * J / (1 + self.c1 * J)
@@ -274,7 +287,9 @@ class _CAMBase(CS):
         h = np.mod(np.arctan2(b, a), np.pi * 2.0)
         M_ = np.hypot(a, b)
         M = (np.exp(M_ * self.c2) - 1.0) / self.c2
-        return convert(self._cam16, dst, np.dstack([J, M, h]).reshape(color.shape))
+        return convert(
+            self._cam16, dst, np.dstack([J, M, h]).reshape(color.shape)
+        )
 
     def distance(self, a: FArray, b: FArray, ord=None) -> float:
         diff = np.divide(a - b, [self.k, 1.0, 1.0])

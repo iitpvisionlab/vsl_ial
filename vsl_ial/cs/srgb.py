@@ -40,5 +40,7 @@ class sRGB(CS):
     def _to_XYZ(self, src: CS, color: FArray) -> FArray:
         color_linRGB = convert(sRGB(), linRGB(), color=color)
         return convert(
-            linRGB(illuminant_xyz=self._illuminant_xyz), XYZ(), color=color_linRGB
+            linRGB(illuminant_xyz=self._illuminant_xyz),
+            XYZ(),
+            color=color_linRGB,
         )

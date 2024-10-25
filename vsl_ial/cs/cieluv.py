@@ -15,7 +15,9 @@ class CIELUV(CS):
         assert illuminant_xyz is not None
         super().__init__(illuminant_xyz)
         self.uv_wp = (
-            illuminant_xyz[0:2] * [4.0, 9.0] / (illuminant_xyz @ [1.0, 15.0, 3.0])
+            illuminant_xyz[0:2]
+            * [4.0, 9.0]
+            / (illuminant_xyz @ [1.0, 15.0, 3.0])
         )
 
     def _from_XYZ(self, src: CS, color: FArray) -> FArray:
@@ -24,7 +26,10 @@ class CIELUV(CS):
 
         XY = color[..., 0:2]
         uv = np.divide(
-            [4.0, 9.0] * XY, denominator, out=np.zeros_like(XY), where=denominator != 0
+            [4.0, 9.0] * XY,
+            denominator,
+            out=np.zeros_like(XY),
+            where=denominator != 0,
         )
 
         l = f(color[..., 1] / wp[1])

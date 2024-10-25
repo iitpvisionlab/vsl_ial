@@ -8,6 +8,7 @@ statistics = image_metric(
     spacial_filters=(create_gauss_kernel_2d(1.0), create_gauss_kernel_2d(1.0), create_gauss_kernel_2d(1.0)),
     metric_color_space=CIELAB(illuminant_xyz=D65))
 """
+
 from __future__ import annotations
 import numpy as np
 from scipy.signal import convolve

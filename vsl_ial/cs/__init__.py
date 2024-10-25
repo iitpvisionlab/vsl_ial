@@ -9,29 +9,29 @@ from .. import FArray
 class whitepoints_cie1931:
     # The "standard" 2 degree observer (CIE 1931)
     # Sourced from http://www.easyrgb.com/index.php?X=MATH&H=15
-    A = np.asfarray([1.09850, 1.0, 0.35585])
-    C = np.asfarray([0.98074, 1.0, 1.18232])
-    D50 = np.asfarray([0.96422, 1.0, 0.82521])
-    D55 = np.asfarray([0.95682, 1.0, 0.92149])
-    D65 = np.asfarray([0.95047, 1.0, 1.08883])
-    D75 = np.asfarray([0.94972, 1.0, 1.22638])
-    F2 = np.asfarray([0.99186, 1.0, 0.67393])
-    F7 = np.asfarray([0.95041, 1.0, 1.08747])
-    F11 = np.asfarray([1.00962, 1.0, 0.64350])
+    A = np.asarray((1.09850, 1.0, 0.35585), dtype=np.float64)
+    C = np.asarray((0.98074, 1.0, 1.18232), dtype=np.float64)
+    D50 = np.asarray((0.96422, 1.0, 0.82521), dtype=np.float64)
+    D55 = np.asarray((0.95682, 1.0, 0.92149), dtype=np.float64)
+    D65 = np.asarray((0.95047, 1.0, 1.08883), dtype=np.float64)
+    D75 = np.asarray((0.94972, 1.0, 1.22638), dtype=np.float64)
+    F2 = np.asarray((0.99186, 1.0, 0.67393), dtype=np.float64)
+    F7 = np.asarray((0.95041, 1.0, 1.08747), dtype=np.float64)
+    F11 = np.asarray((1.00962, 1.0, 0.64350), dtype=np.float64)
 
 
 class whitepoints_cie1964:
     # The "supplementary" 10 degree observer (CIE 1964)
     # Sourced from http://www.easyrgb.com/index.php?X=MATH&H=15
-    A = np.asfarray([1.11144, 1.0, 0.35200])
-    C = np.asfarray([0.97285, 1.0, 1.16145])
-    D50 = np.asfarray([0.96720, 1.0, 0.81427])
-    D55 = np.asfarray([0.95799, 1.0, 0.90926])
-    D65 = np.asfarray([0.94811, 1.0, 1.07304])
-    D75 = np.asfarray([0.94416, 1.0, 1.20641])
-    F2 = np.asfarray([1.03279, 1.0, 0.69027])
-    F7 = np.asfarray([0.95792, 1.0, 1.07686])
-    F11 = np.asfarray([1.03863, 1.0, 0.65607])
+    A = np.asarray((1.11144, 1.0, 0.35200), dtype=np.float64)
+    C = np.asarray((0.97285, 1.0, 1.16145), dtype=np.float64)
+    D50 = np.asarray((0.96720, 1.0, 0.81427), dtype=np.float64)
+    D55 = np.asarray((0.95799, 1.0, 0.90926), dtype=np.float64)
+    D65 = np.asarray((0.94811, 1.0, 1.07304), dtype=np.float64)
+    D75 = np.asarray((0.94416, 1.0, 1.20641), dtype=np.float64)
+    F2 = np.asarray((1.03279, 1.0, 0.69027), dtype=np.float64)
+    F7 = np.asarray((0.95792, 1.0, 1.07686), dtype=np.float64)
+    F11 = np.asarray((1.03863, 1.0, 0.65607), dtype=np.float64)
 
 
 D65 = whitepoints_cie1931.D65
@@ -83,7 +83,7 @@ class CS:
 def convert(
     src: CS, dst: CS, color: npt.ArrayLike, dtype: npt.DTypeLike = None
 ) -> FArray:
-    color = np.asfarray(color, dtype)
+    color = np.asarray(color, dtype)
     return dst.convert(src=src, color=color)
 
 
@@ -104,8 +104,8 @@ def distance(
     ) = "",
     **kwargs: float,
 ) -> float:
-    color1 = np.asfarray(color1, dtype)
-    color2 = np.asfarray(color2, dtype)
+    color1 = np.asarray(color1, dtype)
+    color2 = np.asarray(color2, dtype)
     try:
         method = getattr(cs, "distance" + (f"_{name}" if name else ""))
     except AttributeError:
