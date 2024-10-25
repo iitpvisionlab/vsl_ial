@@ -159,8 +159,8 @@ class TestCaseCSBase:
     def test_XYZ_to_CAM16(self):
         # import colour
         # res = colour.XYZ_to_CIECAM16(
-        #     XYZ=np.asfarray([0.12412, 0.07493, 0.3093]) * 100.0,
-        #     XYZ_w=np.asfarray(D65) * 100.0, L_A=60.0, Y_b=20.0)
+        #     XYZ=np.asarray([0.12412, 0.07493, 0.3093]) * 100.0,
+        #     XYZ_w=np.asarray(D65) * 100.0, L_A=60.0, Y_b=20.0)
         # print("res", res.J, res.M, res.h)
 
         from vsl_ial.cs.cam import CAM16
@@ -175,8 +175,8 @@ class TestCaseCSBase:
     def test_CAM16_to_XYZ(self):
         # import colour
         # res = colour.XYZ_to_CIECAM16(
-        #     XYZ=np.asfarray([0.12412, 0.07493, 0.3093]) * 100.0,
-        #     XYZ_w=np.asfarray(D65) * 100.0, L_A=60.0, Y_b=20.0)
+        #     XYZ=np.asarray([0.12412, 0.07493, 0.3093]) * 100.0,
+        #     XYZ_w=np.asarray(D65) * 100.0, L_A=60.0, Y_b=20.0)
         # print("res", res.J, res.M, res.h)
 
         from vsl_ial.cs.cam import CAM16

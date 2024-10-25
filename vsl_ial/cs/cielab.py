@@ -1,6 +1,7 @@
 """
 https://en.wikipedia.org/wiki/Lab_color_space
 """
+
 from __future__ import annotations
 from typing import NamedTuple
 import numpy as np
@@ -23,7 +24,9 @@ class _CIEDE2000(NamedTuple):
 
 def f(t: FArray):
     delta = 6 / 29
-    return np.where(t > delta**3, 1.16 * np.cbrt(t) - 0.16, t / (delta / 2) ** 3)
+    return np.where(
+        t > delta**3, 1.16 * np.cbrt(t) - 0.16, t / (delta / 2) ** 3
+    )
 
 
 def finv(t: FArray):
@@ -33,19 +36,21 @@ def finv(t: FArray):
 
 
 class CIELAB(CS):
-    A = np.asfarray(
-        [
-            [0.0, 125 / 29, 0.0],
-            [1.0, -125 / 29, 50 / 29],
-            [0.0, 0.0, -50 / 29],
-        ]
+    A = np.asarray(
+        (
+            (0.0, 125 / 29, 0.0),
+            (1.0, -125 / 29, 50 / 29),
+            (0.0, 0.0, -50 / 29),
+        ),
+        dtype=np.float64,
     )
-    Ainv = np.asfarray(
-        [
-            [1.0, 1.0, 1.0],
-            [29 / 125, 0.0, 0.0],
-            [0.0, 0.0, -116 / 200],
-        ]
+    Ainv = np.asarray(
+        (
+            (1.0, 1.0, 1.0),
+            (29 / 125, 0.0, 0.0),
+            (0.0, 0.0, -116 / 200),
+        ),
+        dtype=np.float64,
     )
 
     _illuminant_xyz: FArray
@@ -58,7 +63,9 @@ class CIELAB(CS):
         return np.tensordot(f(color / self._illuminant_xyz), self.A, axes=1)
 
     def _to_XYZ(self, dst: CS, color: FArray):
-        return finv(np.tensordot(color, self.Ainv, axes=1)) * self._illuminant_xyz
+        return (
+            finv(np.tensordot(color, self.Ainv, axes=1)) * self._illuminant_xyz
+        )
 
     distance_cie76 = CS.distance
 

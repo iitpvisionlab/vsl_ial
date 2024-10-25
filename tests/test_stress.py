@@ -12,8 +12,14 @@ from vsl_ial.stress import (
 import numpy as np
 
 
-a = np.asfarray([1.3, 5.0, 10.0, 3.0, 0.12, 10.0, 32.4, 1, 8.0, 0.4, 0.454])
-b = np.asfarray([2.3, 3.0, 13.0, 2.0, 0.52, 33.0, 2.0, 17.0, 0.4, 0.30, 0.7])
+a = np.asarray(
+    (1.3, 5.0, 10.0, 3.0, 0.12, 10.0, 32.4, 1, 8.0, 0.4, 0.454),
+    dtype=np.float64,
+)
+b = np.asarray(
+    (2.3, 3.0, 13.0, 2.0, 0.52, 33.0, 2.0, 17.0, 0.4, 0.30, 0.7),
+    dtype=np.float64,
+)
 
 
 class TestCaseS(unittest.TestCase):
