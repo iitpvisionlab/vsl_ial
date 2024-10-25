@@ -56,7 +56,7 @@ class JzAzBz(CS):
     #
     # https://observablehq.com/@jrus/jzazbz
     #
-    def _from_XYZ(self, src: CS, color: FArray) -> FArray:
+    def from_XYZ(self, src: CS, color: FArray) -> FArray:
         def pqInv(X: FArray) -> FArray:
             XX = (X * 1e-4) ** 0.1593017578125
             return (
@@ -69,7 +69,7 @@ class JzAzBz(CS):
         Iaz[..., 0] = (0.44 * Iz) / (1 - 0.56 * Iz) - 1.6295499532821566e-11
         return Iaz
 
-    def _to_XYZ(self, src: CS, color: FArray) -> FArray:
+    def to_XYZ(self, src: CS, color: FArray) -> FArray:
         Jz = color[..., 0] + 1.6295499532821566e-11
         color[..., 0] = Jz / (0.44 + 0.56 * Jz)
 

@@ -27,14 +27,14 @@ class ProLab(CS):
         dtype=np.float64,
     )
 
-    def _from_XYZ(self, src: CS, color: FArray) -> FArray:
+    def from_XYZ(self, src: CS, color: FArray) -> FArray:
         color_ = color / self._illuminant_xyz
         return (
             (np.tensordot(color_, self.Q, axes=1)).T
             / (np.tensordot(color_, self.q, axes=1).T + 1.0)
         ).T
 
-    def _to_XYZ(self, dst: CS, color: FArray) -> FArray:
+    def to_XYZ(self, dst: CS, color: FArray) -> FArray:
         y2 = np.tensordot(color, self.Q_inv, axes=1)
         xyz = y2.T / (1.0 - np.tensordot(y2, self.q, axes=1)).T
         return xyz.T * self._illuminant_xyz

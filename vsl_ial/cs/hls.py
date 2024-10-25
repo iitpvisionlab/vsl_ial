@@ -8,7 +8,7 @@ class HLS(CS):
     https://en.wikipedia.org/wiki/HSL_and_HSV
     """
 
-    def _from_sRGB(self, src: CS, color: FArray) -> FArray:
+    def from_sRGB(self, src: CS, color: FArray) -> FArray:
         maxc = np.max(color, axis=-1)
         minc = np.min(color, axis=-1)
         sumc = maxc + minc
@@ -40,7 +40,7 @@ class HLS(CS):
         hue = (hue / 6.0) % 1.0
         return np.dstack((hue, l, saturation)).reshape(color.shape)
 
-    def _to_sRGB(self, src: CS, color: FArray) -> FArray:
+    def to_sRGB(self, src: CS, color: FArray) -> FArray:
         h, l, s = color.T
         m2 = np.where(l <= 0.5, l * (1.0 + s), l + s - (l * s))
         m1 = 2.0 * l - m2

@@ -28,11 +28,11 @@ class linRGB(CS):
         assert illuminant_xyz is None
         super().__init__()
 
-    def _from_XYZ(self, src: CS, color: FArray) -> FArray:
+    def from_XYZ(self, src: CS, color: FArray) -> FArray:
         assert src.__class__.__name__ == "XYZ"
         return color @ LIN_RGB_MATRIX
 
-    def _from_sRGB(self, src: CS, color: FArray) -> FArray:
+    def from_sRGB(self, src: CS, color: FArray) -> FArray:
         if color.min() < 0 or color.max() > 1:
             # this warning is usually harmless
             warnings.warn(
@@ -60,5 +60,5 @@ class linRGB(CS):
             color[~mask] /= 12.92
         return color
 
-    def _to_XYZ(self, src: CS, color: FArray) -> FArray:
+    def to_XYZ(self, src: CS, color: FArray) -> FArray:
         return color @ LIN_RGB_MATRIX_INV

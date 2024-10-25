@@ -39,7 +39,7 @@ class ICaCb(CS):
         dtype=np.float64,
     )
 
-    def _from_XYZ(self, src: CS, color: FArray) -> FArray:
+    def from_XYZ(self, src: CS, color: FArray) -> FArray:
         n = 2610.0 / (2**14)
         m = 2523.0 / (2**5)
         c_1 = 3424.0 / (2**12)
@@ -54,7 +54,7 @@ class ICaCb(CS):
         ) ** m
         return np.tensordot(rgb_tmp_points, self.lCaCb_matrix, axes=1)
 
-    def _to_XYZ(self, src: CS, color: FArray) -> FArray:
+    def to_XYZ(self, src: CS, color: FArray) -> FArray:
         n = 2610.0 / (2**14)
         m = 2523.0 / (2**5)
         c_1 = 3424.0 / (2**12)

@@ -4,12 +4,12 @@ import numpy as np
 
 
 class CIExyY(CS):
-    def _from_XYZ(self, src: CS, color: FArray) -> FArray:
+    def from_XYZ(self, src: CS, color: FArray) -> FArray:
         sum_ = color.sum(axis=-1).T
         X, Y, _Z = color.T
         return np.dstack((X / sum_, Y / sum_, Y)).reshape(color.shape)
 
-    def _to_XYZ(self, dst: CS, color: FArray) -> FArray:
+    def to_XYZ(self, dst: CS, color: FArray) -> FArray:
         x, y, Y = color.T
         Y_div_y = Y / y
         return np.dstack((x * Y_div_y, Y, (1.0 - x - y) * Y_div_y)).reshape(

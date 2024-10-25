@@ -20,7 +20,7 @@ class CIELUV(CS):
             / (illuminant_xyz @ [1.0, 15.0, 3.0])
         )
 
-    def _from_XYZ(self, src: CS, color: FArray) -> FArray:
+    def from_XYZ(self, src: CS, color: FArray) -> FArray:
         wp = self._illuminant_xyz
         denominator = (color @ [1.0, 15.0, 3.0]).T
 
@@ -37,7 +37,7 @@ class CIELUV(CS):
         uv = 13.0 * l.T * (uv - self.uv_wp)
         return np.dstack((l.T, *uv.T)).reshape(color.shape)
 
-    def _to_XYZ(self, src: CS, color: FArray) -> FArray:
+    def to_XYZ(self, src: CS, color: FArray) -> FArray:
         l, uv = color[..., 0], color[..., 1:3]
         puv = uv / (13.0 * l.T) + self.uv_wp
         y = finv(l.T)

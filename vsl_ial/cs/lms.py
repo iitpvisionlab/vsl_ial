@@ -26,8 +26,8 @@ class LMS(CS):
         dtype=np.float64,
     )
 
-    def _from_XYZ(self, src: CS, color: FArray) -> FArray:
+    def from_XYZ(self, src: CS, color: FArray) -> FArray:
         return color @ self.VON_KRIES_M.T
 
-    def _to_XYZ(self, src: CS, color: FArray) -> FArray:
+    def to_XYZ(self, src: CS, color: FArray) -> FArray:
         return color @ self.VON_KRIES_M_INV.T

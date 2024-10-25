@@ -39,7 +39,7 @@ class ICtCp(CS):
         dtype=np.float64,
     ) / [[720.0], [360.0], [720.0]]
 
-    def _from_XYZ(self, src: CS, color: FArray) -> FArray:
+    def from_XYZ(self, src: CS, color: FArray) -> FArray:
         m_1 = 0.1593017578125
         m_2 = 78.84375
         c_2 = 18.8515625
@@ -50,7 +50,7 @@ class ICtCp(CS):
 
         return np.tensordot(lms_2, self.ictcp_matrix, axes=1)
 
-    def _to_XYZ(self, src: CS, color: FArray) -> FArray:
+    def to_XYZ(self, src: CS, color: FArray) -> FArray:
         m_1 = 1.0 / 0.1593017578125
         m_2 = 1.0 / 78.84375
         c_2 = 18.8515625
