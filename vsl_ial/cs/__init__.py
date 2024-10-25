@@ -127,6 +127,8 @@ available_cs = {
     "CIELAB": "cielab",
     "CIELUV": "cieluv",
     "CIExyY": "ciexyy",
+    "HLS": "hls",
+    "HSV": "hsv",
     "ICaCb": "icacb",
     "ICtCp": "ictcp",
     "JzAzBz": "jzazbz",

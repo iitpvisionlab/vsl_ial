@@ -20,6 +20,32 @@ import numpy.typing as npt
 
 
 class TestCaseCSBase:
+    # https://en.wikipedia.org/wiki/HSL_and_HSV
+    wikipedia_sRGB_colors = (
+        (1.000, 1.000, 1.000),
+        (0.500, 0.500, 0.500),
+        (0.000, 0.000, 0.000),
+        (1.000, 0.000, 0.000),
+        (0.750, 0.750, 0.000),
+        (0.000, 0.500, 0.000),
+        (0.500, 1.000, 1.000),
+        (0.500, 0.500, 1.000),
+        (0.750, 0.250, 0.750),
+        (0.628, 0.643, 0.142),
+        (0.255, 0.104, 0.918),
+        (0.116, 0.675, 0.255),
+        (0.941, 0.785, 0.053),
+        (0.704, 0.187, 0.897),
+        (0.931, 0.463, 0.316),
+        (0.998, 0.974, 0.532),
+        (0.099, 0.795, 0.591),
+        (0.211, 0.149, 0.597),
+        (0.495, 0.493, 0.721),
+    )
+
+    def setUp(self):
+        np.seterr(all="raise")
+
     def test_XYZ_to_sRGB(self):
         self._test(
             XYZ(),
@@ -59,6 +85,54 @@ class TestCaseCSBase:
             color=[0.4, 0.2, 0.6],
             ref=[0.12412, 0.07493, 0.3093],
         )
+
+    def test_sRGB_to_HLS(self):
+        from vsl_ial.cs import HLS
+        from colorsys import rgb_to_hls
+
+        for color in self.wikipedia_sRGB_colors:
+            self._test(
+                sRGB(),
+                HLS(),
+                color=color,
+                ref=rgb_to_hls(*color),
+            )
+
+    def test_HSL_to_sRGB(self):
+        from vsl_ial.cs import HLS
+        from colorsys import rgb_to_hls
+
+        for color in self.wikipedia_sRGB_colors:
+            self._test(
+                HLS(),
+                sRGB(),
+                color=rgb_to_hls(*color),
+                ref=color,
+            )
+
+    def test_sRGB_to_HSV(self):
+        from vsl_ial.cs import HSV
+        from colorsys import rgb_to_hsv
+
+        for color in self.wikipedia_sRGB_colors:
+            self._test(
+                sRGB(),
+                HSV(),
+                color=color,
+                ref=rgb_to_hsv(*color),
+            )
+
+    def test_HSV_to_sRGB(self):
+        from vsl_ial.cs import HSV
+        from colorsys import rgb_to_hsv
+
+        for color in self.wikipedia_sRGB_colors:
+            self._test(
+                HSV(),
+                sRGB(),
+                color=rgb_to_hsv(*color),
+                ref=color,
+            )
 
     def test_XYZ_to_Jzazbz(self):
         self._test(
