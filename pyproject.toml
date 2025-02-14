@@ -1,6 +1,6 @@
 [project]
 name = "vsl_ial"
-version = "0.0.1"
+dynamic = ["version"]
 authors = [
   { name="Arseniy Terekhin", email="senyai@gmail.com" },
   { name="Dmitry Nikolaev" },
@@ -14,6 +14,13 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+[build-system]
+requires = [
+  "setuptools",
+  "wheel",
+]
+[tool.setuptools.dynamic]
+version = {attr = "vsl_ial.__version__"}
 [tool.black]
 line-length = 79
 target-version = ["py310"]
