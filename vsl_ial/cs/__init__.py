@@ -150,7 +150,7 @@ __all__ = (
 ) + tuple(available_cs)
 
 
-def __getattr__(cs_name: str) -> CS:
+def __getattr__(cs_name: str) -> type[CS]:
     try:
         module_name = available_cs[cs_name]
     except Exception:
