@@ -46,6 +46,15 @@ class TestCaseCSBase:
     def setUp(self):
         np.seterr(all="raise")
 
+    def _test(
+        self,
+        src: CS,
+        dst: CS,
+        color: npt.ArrayLike,
+        ref: npt.ArrayLike,
+    ) -> None:
+        raise NotImplementedError
+
     def test_XYZ_to_sRGB(self):
         self._test(
             XYZ(),
