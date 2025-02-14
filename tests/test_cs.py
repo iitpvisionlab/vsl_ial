@@ -346,6 +346,26 @@ class TestCaseCSBase:
             ref=[0.12412, 0.07493, 0.3093],
         )
 
+    def test_XYZ_to_Opponent(self):
+        from vsl_ial.cs.opponent import Opponent
+
+        self._test(
+            XYZ(),
+            Opponent(),
+            color=[0.12412, 0.07493, 0.3093],
+            ref=[0.05548398, -0.05781628, 0.12142492],
+        )
+
+    def test_Opponent_to_XYZ(self):
+        from vsl_ial.cs.opponent import Opponent
+
+        self._test(
+            Opponent(),
+            XYZ(),
+            color=[0.05548398, -0.05781628, 0.12142492],
+            ref=[0.12412, 0.07493, 0.3093],
+        )
+
 
 class TestCaseCS1D(TestCaseCSBase, unittest.TestCase):
     def _test(
