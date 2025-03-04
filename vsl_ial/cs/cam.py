@@ -105,7 +105,7 @@ class CAMCommon(CS):
         self.N_cb = self.N_bb
 
         k = 1.0 / (500.0 * L_A + 1.0)
-        k4 = 0.0 if np.isinf(L_A) else k ** 4
+        k4 = 0.0 if np.isinf(L_A) else k**4
         self.F_L = k4 * L_A + 0.1 * (1.0 - k4) ** 2 * np.cbrt(500.0 * L_A)
         self.F_L_root4 = self.F_L**0.25
 
