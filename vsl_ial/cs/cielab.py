@@ -25,7 +25,7 @@ class _CIEDE2000(NamedTuple):
 def f(t: FArray):
     delta = 6 / 29
     return np.where(
-        t > delta**3, 1.16 * np.cbrt(t) - 0.16, t / (delta / 2) ** 3
+        t > delta**3, 1.16 * np.cbrt(t) - 0.16, 0.01 * t / (delta / 2) ** 3
     )
 
 
