@@ -304,6 +304,12 @@ class TestCaseCSBase:
             color=[0.12412, 0.07493, 0.3093],
             ref=[0.329039, 0.428786, -0.47156],
         )
+        self._test(
+            XYZ(),
+            CIELAB(illuminant_xyz=D65),
+            color=[0.0087, 0.0085, 0.0135],
+            ref=[0.076780185185185, 0.02531210019708, -0.054659059902865],
+        )
 
     def test_CIELAB_to_XYZ(self):
         from vsl_ial.cs.cielab import CIELAB
@@ -313,6 +319,12 @@ class TestCaseCSBase:
             XYZ(),
             color=[0.329039 * 1.0, 0.428786 * 1.0, -0.47156 * 1.0],
             ref=[0.12412, 0.07493, 0.3093],
+        )
+        self._test(
+            CIELAB(illuminant_xyz=D65),
+            XYZ(),
+            color=[0.076780185185185, 0.02531210019708, -0.054659059902865],
+            ref=[0.0087, 0.0085, 0.0135],
         )
 
     def test_XYZ_to_CAM02(self):
