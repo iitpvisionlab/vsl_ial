@@ -387,6 +387,20 @@ class TestCaseCSBase:
             ref=[0.12412, 0.07493, 0.3093],
         )
 
+    def test_XYZ_to_PCS23UCS(self):
+        from vsl_ial.cs.pcs23 import PCS23UCS
+
+        self._test(
+            XYZ(),
+            PCS23UCS(),
+            color=[0.12412, 0.07493, 0.3093],
+            ref=[
+                0.37906899651832376,
+                0.44347849030655695,
+                -0.0011813840207282051,
+            ],
+        )
+
 
 class TestCaseCS1D(TestCaseCSBase, unittest.TestCase):
     def _test(

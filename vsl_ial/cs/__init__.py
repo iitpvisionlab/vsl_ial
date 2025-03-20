@@ -139,6 +139,7 @@ available_cs = {
     "ProLab": "prolab",
     "sRGB": "srgb",
     "XYZ": "xyz",
+    "PCS23UCS": "pcs23",
 }
 
 __all__ = (
