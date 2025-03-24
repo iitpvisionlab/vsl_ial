@@ -41,6 +41,11 @@ LMS_TO_LAB_INV = np.asarray(
 
 
 class Oklab(CS):
+    """
+    Oklab color space,
+    https://bottosson.github.io/posts/oklab/
+    """
+
     def from_XYZ(self, src: CS, color: FArray) -> FArray:
         lms = np.tensordot(color, XYZ_TO_LMS, axes=1)
         lms_cubic_root = np.cbrt(lms)
