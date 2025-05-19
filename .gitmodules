@@ -1,0 +1,3 @@
+[submodule "vsl_ial/datasets/distance/order/mrr-revised"]
+	path = vsl_ial/datasets/distance/order/mrr-revised
+	url = git@github.com:iitpvisionlab/mrr-revised.git
