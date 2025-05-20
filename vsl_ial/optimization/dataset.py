@@ -1,7 +1,7 @@
 from __future__ import annotations
 from pathlib import Path
+from typing import Literal, Annotated, ClassVar, Any, Callable, TypeAlias
 
-from typing import Literal, Annotated, ClassVar, Any
 from pydantic import Field
 import json5
 from ._base import StrictModel
@@ -114,12 +114,125 @@ class DatasetMacadam_1974(BaseDataset):
     name: Literal["macadam_1974"]
 
 
-class DatasetMrrRevised(BaseDataset):
-    name: Literal["mrr"]
+# class DatasetMrrRevised(BaseDataset):
+#     name: Literal["mrr"]
 
 
 class DatasetMunsell(BaseDataset):
     name: Literal["munsell"]
+    version: Literal["2.0", "3.2"] = "3.2"
+
+    class Row(NamedTuple):
+        H: str
+        H_color: Literal["R", "YR", "Y", "GY", "G", "BG", "B", "PB", "P", "RP"]
+        H_value: float
+        V: int
+        C: int
+        x: float
+        y: float
+        Y: float
+
+        @classmethod
+        def from_line(cls, line: str):
+            H, V, C, x, y, Y = line.split(",")
+            idx = H.index(".") + 2
+            H_value = float(H[:idx])
+            H_color = H[idx:]
+            return cls(
+                H=H,
+                H_color=H_color,
+                H_value=H_value,
+                V=int(V),
+                C=int(C),
+                x=float(x),
+                y=float(y),
+                Y=float(Y),
+            )
+
+    # class Row2(NamedTuple):
+    #     row: Row
+    #     order: Literal["hv", "vc", "hc"]
+
+    #     def key_hv(self):
+    #         return self.row.h
+
+    @staticmethod
+    def key_h(
+        row: Row,
+        order: tuple[str, ...] = (
+            "R",
+            "YR",
+            "Y",
+            "GY",
+            "G",
+            "BG",
+            "B",
+            "PB",
+            "P",
+            "RP",
+        ),
+    ):
+        return order.index(row.H_color), row.H_value
+
+    @staticmethod
+    def key_v(row: Row):
+        return row.V
+
+    @staticmethod
+    def key_c(row: Row):
+        return row.C
+
+    def load(self) -> list[Dataset]:
+        from collections import defaultdict
+
+        Key: TypeAlias = tuple[str, Callable[[DatasetMunsell.Row], Any]]
+
+        version = self.version.replace(".", "-")
+        csv = dataset_root / "mrr-revised" / f"munsell_{version}.csv"
+        groups = defaultdict[Key, self.Row](list)
+
+        with csv.open() as f:
+            next(f)
+            for line in f:
+                row = self.Row.from_line(line)
+                groups[(f"h={row.H}_v={row.V}", self.key_c)].append(row)
+                if row.C != 0:
+                    groups[(f"v={row.V}_c={row.C}", self.key_h)].append(row)
+                groups[(f"h={row.H}_c={row.C}", self.key_v)].append(row)
+
+        ret: list[Dataset] = []
+        for key, group in groups.items():
+            if len(group) > 1:
+                group.sort(key=key[1])
+                ret.append(
+                    self.group_as_dataset(f"{self.version}-{key[0]}", group)
+                )
+        return ret
+
+    @staticmethod
+    def group_as_dataset(key: str, rows: list[Row]) -> Dataset:
+        from vsl_ial.cs import whitepoints_cie1931
+        from vsl_ial.cs.ciexyy import CIExyY
+
+        n = len(rows) - 1
+
+        xyy = np.asarray(
+            [(row.x, row.y, row.Y) for row in rows], dtype=np.float64
+        )
+        xyz = CIExyY(None).to_XYZ(None, xyy)
+
+        return Dataset(
+            name=f"munsell-{key}",
+            L_A=64.0,
+            Y_b=20.0,
+            c=0.69,
+            Nc=1.0,
+            F=1.0,
+            illuminant=whitepoints_cie1931.C,
+            dv=np.asarray([1.0] * n, dtype=np.float64),
+            pairs=list(zip(range(n), range(1, n + 1))),
+            xyz=xyz,
+        )
 
 
 class DatasetObservers(BaseDataset):
@@ -170,7 +283,6 @@ DatasetConfig = Annotated[
     | DatasetLuo_rigg
     | DatasetMacadam_1942
     | DatasetMacadam_1974
-    | DatasetMrrRevised
     | DatasetMunsell
     | DatasetObservers
     | DatasetRit_dupont
