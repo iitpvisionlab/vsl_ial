@@ -109,9 +109,10 @@ class CAMCommon(CS):
         self.F_L = k4 * L_A + 0.1 * (1.0 - k4) ** 2 * np.cbrt(500.0 * L_A)
         self.F_L_root4 = self.F_L**0.25
 
-        self.D_RGB = self._calc_d_rgb(
+        self.D_RGB = self.calc_d_rgb(
+            M=self.M,
             illuminant_src=illuminant_xyz,
-            illuminant_dst=[1.0, 1.0, 1.0],
+            illuminant_dst=np.asarray([1.0, 1.0, 1.0]),
             F_LA_or_D=(surround.F, L_A),
         )
         _, self.A_w = self._postadaptation_cone_response(illuminant_xyz)
@@ -207,15 +208,15 @@ class CAMCommon(CS):
 
         return np.dstack((J, M, h_shift))
 
-    @classmethod
-    def _calc_d_rgb(
-        cls,
+    @staticmethod
+    def calc_d_rgb(
+        M: FArray,
         illuminant_src: FArray,
         illuminant_dst: FArray,
         F_LA_or_D: Union[Tuple[float, float], float],
     ) -> FArray:
-        rgb_w = cls.M @ illuminant_src
-        rgb_wr = cls.M @ illuminant_dst
+        rgb_w = M @ illuminant_src
+        rgb_wr = M @ illuminant_dst
         Y_w: float = illuminant_src[1]
         Y_wr: float = illuminant_dst[1]
 
@@ -233,6 +234,35 @@ class CAMCommon(CS):
             assert 0.0 <= D <= 1.0, D
         D_RGB = D * (Y_w * rgb_wr) / (Y_wr * rgb_w) + 1 - D
         return D_RGB
+
+
+class _CATBase:
+    M: ClassVar[FArray]
+    M_INV: ClassVar[FArray]
+
+    def __init__(
+        self,
+        illuminant_src: FArray,
+        illuminant_dst: FArray,
+        F_LA_or_D: tuple[float, float] | float,
+    ):
+        D_RGB = CAMCommon.calc_d_rgb(
+            self.M, illuminant_src, illuminant_dst, F_LA_or_D
+        )
+        self._M = (self.M_INV @ (self.M.T * D_RGB).T).T
+
+    def __call__(self, xyz: FArray):
+        return xyz @ self._M
+
+
+class CAT02(_CATBase):
+    M = M_CAT02
+    M_INV = M_CAT02_INV
+
+
+class CAT16(_CATBase):
+    M = M_16
+    M_INV = M_16_INV
 
 
 class CAM16(CAMCommon):
