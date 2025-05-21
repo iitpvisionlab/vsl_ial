@@ -262,21 +262,21 @@ class CAM02(CAMCommon):
 
 class _CAMBase(CS):
     c1 = 0.007 * 100.0
-    cls: CAM16 | CAM02
+    cls: ClassVar[type[CAMCommon]]
     c2: ClassVar[float]
     k: ClassVar[float]
 
     def __init__(
         self,
-        illuminant_xyz: Optional[FArray],
+        illuminant_xyz: FArray,
         L_A: float,
         Y_b: float,
         surround: Surround,
     ):
-        self._cam16 = CAM16(illuminant_xyz, L_A, Y_b, surround)
+        self._cam = self.cls(illuminant_xyz, L_A, Y_b, surround)
 
     def from_XYZ(self, src: CS, color: FArray) -> FArray:
-        J, M, h = convert(src, self._cam16, color).T
+        J, M, h = convert(src, self._cam, color).T
         M_ = np.log(1 + self.c2 * M) / self.c2
         J_ = 1.7 * J / (1 + self.c1 * J)
         return np.array([J_, M_ * np.cos(h), M_ * np.sin(h)]).T
@@ -288,7 +288,7 @@ class _CAMBase(CS):
         M_ = np.hypot(a, b)
         M = (np.exp(M_ * self.c2) - 1.0) / self.c2
         return convert(
-            self._cam16, dst, np.dstack([J, M, h]).reshape(color.shape)
+            self._cam, dst, np.dstack([J, M, h]).reshape(color.shape)
         )
 
     def distance(self, a: FArray, b: FArray, ord=None) -> float:
@@ -298,35 +298,35 @@ class _CAMBase(CS):
 
 class CAM16UCS(_CAMBase):
     c2 = 0.0228 * 100.0
-    cls: CAM16
+    cls = CAM16
     k = 1.0
 
 
 class CAM16LCD(_CAMBase):
     c2 = 0.0053 * 100.0
-    cls: CAM16
+    cls = CAM16
     k = 0.77
 
 
 class CAM16SCD(_CAMBase):
     c2 = 0.0363 * 100.0
-    cls: CAM16
+    cls = CAM16
     k = 1.24
 
 
 class CAM02UCS(_CAMBase):
     c2 = 0.0228 * 100.0
-    cls: CAM02
+    cls = CAM02
     k = 1.0
 
 
 class CAM02LCD(_CAMBase):
     c2 = 0.0053 * 100.0
-    cls: CAM02
+    cls = CAM02
     k = 0.77
 
 
 class CAM02SCD(_CAMBase):
     c2 = 0.0363 * 100.0
-    cls: CAM02
+    cls = CAM02
     k = 1.24
