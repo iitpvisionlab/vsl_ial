@@ -1,4 +1,5 @@
 import unittest
+from typing import Callable
 from vsl_ial.cs import (
     convert,
     XYZ,
@@ -12,6 +13,7 @@ from vsl_ial.cs import (
     ICaCb,
     ICtCp,
     CIELUV,
+    whitepoints_cie1964,
 )
 from vsl_ial.cs.prolab import ProLab
 from vsl_ial.cs.cam import Average
@@ -50,6 +52,14 @@ class TestCaseCSBase:
         self,
         src: CS,
         dst: CS,
+        color: npt.ArrayLike,
+        ref: npt.ArrayLike,
+    ) -> None:
+        raise NotImplementedError
+
+    def _test_f(
+        self,
+        f: Callable[[npt.ArrayLike], npt.ArrayLike],
         color: npt.ArrayLike,
         ref: npt.ArrayLike,
     ) -> None:
@@ -401,6 +411,31 @@ class TestCaseCSBase:
             ],
         )
 
+    def test_cat02(self):
+        from vsl_ial.cs.cam import CAT02
+
+        cat02 = CAT02(
+            illuminant_src=whitepoints_cie1964.D50,
+            illuminant_dst=whitepoints_cie1964.D65,
+            F_LA_or_D=0.8,
+        )
+        self._test_f(
+            cat02,
+            [0.12412, 0.07493, 0.3093],
+            [0.13432999186494882, 0.07917329191464952, 0.3865924699953725],
+        )
+
+        cat02 = CAT02(
+            illuminant_src=whitepoints_cie1964.D50,
+            illuminant_dst=whitepoints_cie1964.D65,
+            F_LA_or_D=(Average.F, 1.1),
+        )
+        self._test_f(
+            cat02,
+            [0.12412, 0.07493, 0.3093],
+            [0.1362031329174131, 0.07995176043384412, 0.4007725940907399],
+        )
+
 
 class TestCaseCS1D(TestCaseCSBase, unittest.TestCase):
     def _test(
@@ -410,8 +445,19 @@ class TestCaseCS1D(TestCaseCSBase, unittest.TestCase):
         color: npt.ArrayLike,
         ref: npt.ArrayLike,
     ):
+        color = np.asarray(color)
+        assert color.ndim == 1, color.ndim
         res_1d = convert(src, dst, color=color)
         np.testing.assert_almost_equal(res_1d, ref, decimal=4)
+
+    def _test_f(
+        self,
+        f: Callable[[npt.ArrayLike], npt.ArrayLike],
+        color: npt.ArrayLike,
+        ref: npt.ArrayLike,
+    ):
+        res_1d = f(color)
+        np.testing.assert_almost_equal(res_1d, ref, decimal=8)
 
 
 class TestCaseCS2D(TestCaseCSBase, unittest.TestCase):
@@ -424,6 +470,15 @@ class TestCaseCS2D(TestCaseCSBase, unittest.TestCase):
     ):
         res_2d = convert(src, dst, color=[color, color])
         np.testing.assert_almost_equal(res_2d, [ref, ref], decimal=4)
+
+    def _test_f(
+        self,
+        f: Callable[[npt.ArrayLike], npt.ArrayLike],
+        color: npt.ArrayLike,
+        ref: npt.ArrayLike,
+    ):
+        res_2d = f([color, color])
+        np.testing.assert_almost_equal(res_2d, [ref, ref], decimal=8)
 
 
 class TestCaseCS3D(TestCaseCSBase, unittest.TestCase):
@@ -439,4 +494,15 @@ class TestCaseCS3D(TestCaseCSBase, unittest.TestCase):
         )
         np.testing.assert_almost_equal(
             res_3d, [[ref, ref, ref], [ref, ref, ref]], decimal=4
+        )
+
+    def _test_f(
+        self,
+        f: Callable[[npt.ArrayLike], npt.ArrayLike],
+        color: npt.ArrayLike,
+        ref: npt.ArrayLike,
+    ):
+        res_2d = f([[color, color, color], [color, color, color]])
+        np.testing.assert_almost_equal(
+            res_2d, [[ref, ref, ref], [ref, ref, ref]], decimal=8
         )
