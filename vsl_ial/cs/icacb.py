@@ -3,7 +3,7 @@ import numpy as np
 
 
 class ICaCb(CS):
-    rgb_matrix = np.asarray(
+    rgb_matrix = np.array(
         (
             (0.37613, -0.21649, 0.02567),
             (0.70431, 1.14744, 0.16713),
@@ -12,7 +12,7 @@ class ICaCb(CS):
         dtype=np.float64,
     )
 
-    rgb_matrix_inv = np.asarray(
+    rgb_matrix_inv = np.array(
         (
             (1.9380097630323718, 0.3726932255022942, -0.15092197668921598),
             (-1.2240118236920852, 0.6453747900837897, -0.10297178575136787),
@@ -21,7 +21,7 @@ class ICaCb(CS):
         dtype=np.float64,
     )
 
-    lCaCb_matrix = np.asarray(
+    lCaCb_matrix = np.array(
         (
             (0.4949, 4.2854, 0.3605),
             (0.5037, -4.5462, 1.1499),
@@ -30,7 +30,7 @@ class ICaCb(CS):
         dtype=np.float64,
     )
 
-    lCaCb_matrix_inv = np.asarray(
+    lCaCb_matrix_inv = np.array(
         (
             (1.0028987160875324, 1.0029177996452858, 1.0028468487002118),
             (0.11592986443747855, -0.11408071717162871, -0.059178219494170695),

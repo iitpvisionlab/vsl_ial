@@ -4,7 +4,7 @@ import numpy as np
 
 
 class ICtCp(CS):
-    lms_matrix = np.asarray(
+    lms_matrix = np.array(
         (
             (0.3593, -0.1921, 0.0071),
             (0.6976, 1.1005, 0.0748),
@@ -13,7 +13,7 @@ class ICtCp(CS):
         dtype=np.float64,
     )
 
-    lms_matrix_inv = np.asarray(
+    lms_matrix_inv = np.array(
         (
             (2.0700345210961406, 0.3647497844879312, -0.04978125101325728),
             (-1.326231182012956, 0.6805456704366378, -0.04919788302664357),
@@ -23,14 +23,14 @@ class ICtCp(CS):
     )
 
     ictcp_matrix = (
-        np.asarray(
+        np.array(
             [[2048, 6610, 17933], [2048, -13613, -17933], [0, 7003, -543]],
             dtype=np.float64,
         )
         / 4096
     ) * [720.0, 360.0, 720.0]
 
-    ictcp_matrix_inv = np.asarray(
+    ictcp_matrix_inv = np.array(
         [
             (1.0145055084292036, 0.9854944915707965, 0.9581115383458825),
             (0.008484158578611704, -0.008484158578611704, 0.5603919550285215),

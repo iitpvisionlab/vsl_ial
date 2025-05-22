@@ -80,7 +80,7 @@ Dark = Surround(0.8, 0.525, 0.8)
 
 class CAMCommon(CS):
     RGB_a_coefs = (
-        np.asarray(
+        np.array(
             ((460, +451, +288), (460, -891, -261), (460, -220, -6300)),
             dtype=np.float64,
         )
@@ -114,7 +114,7 @@ class CAMCommon(CS):
         self.D_RGB = self.calc_d_rgb(
             M=self.M,
             illuminant_src=illuminant_xyz,
-            illuminant_dst=np.asarray([1.0, 1.0, 1.0]),
+            illuminant_dst=np.array((1.0, 1.0, 1.0)),
             F_LA_or_D=(surround.F, L_A),
         )
         _, self.A_w = self._postadaptation_cone_response(illuminant_xyz)
@@ -153,7 +153,7 @@ class CAMCommon(CS):
         a = r * cos_h
         b = r * sin_h
 
-        RGB_a = np.asarray([p_2, a, b]).T @ self.RGB_a_coefs.T
+        RGB_a = np.array((p_2, a, b)).T @ self.RGB_a_coefs.T
         RGB_a_abs = np.abs(RGB_a)
         constant = 1.0 / self.F_L * 27.13 ** (1.0 / 0.42)
         RGB_c = (

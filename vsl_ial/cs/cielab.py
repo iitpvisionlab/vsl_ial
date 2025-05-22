@@ -36,7 +36,7 @@ def finv(t: FArray):
 
 
 class CIELAB(CS):
-    A = np.asarray(
+    A = np.array(
         (
             (0.0, 125 / 29, 0.0),
             (1.0, -125 / 29, 50 / 29),
@@ -44,7 +44,7 @@ class CIELAB(CS):
         ),
         dtype=np.float64,
     )
-    Ainv = np.asarray(
+    Ainv = np.array(
         (
             (1.0, 1.0, 1.0),
             (29 / 125, 0.0, 0.0),

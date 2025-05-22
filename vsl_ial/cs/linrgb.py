@@ -4,7 +4,7 @@ import numpy as np
 import warnings
 
 
-LIN_RGB_MATRIX = np.asarray(
+LIN_RGB_MATRIX = np.array(
     (
         (3.2404542, -0.9692660, 0.0556434),
         (-1.5371385, 1.8760108, -0.2040259),
@@ -13,7 +13,7 @@ LIN_RGB_MATRIX = np.asarray(
     dtype=np.float64,
 )
 
-LIN_RGB_MATRIX_INV = np.asarray(
+LIN_RGB_MATRIX_INV = np.array(
     (
         (0.4124564, 0.2126729, 0.0193339),
         (0.3575761, 0.7151522, 0.1191920),
