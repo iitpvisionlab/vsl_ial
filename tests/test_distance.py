@@ -78,7 +78,7 @@ class TestCaseDistance3D(TestCaseDistanceBase, unittest.TestCase):
 
 class TestDistances(unittest.TestCase):
     Lab_pairs = (
-        np.asarray(
+        np.array(
             (
                 (50.0000, 2.6772, -79.7751),
                 (50.0000, 3.1571, -77.2803),
@@ -117,7 +117,7 @@ class TestDistances(unittest.TestCase):
             ),
             dtype=np.float64,
         ),
-        np.asarray(
+        np.array(
             (
                 (50.0000, 0.0000, -82.7485),
                 (50.0000, 0.0000, -82.7485),

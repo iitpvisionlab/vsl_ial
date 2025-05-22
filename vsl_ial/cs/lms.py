@@ -9,7 +9,7 @@ class LMS(CS):
     2. Fairchild, M. (2005). Color appearance in image displays, p. 177
     """
 
-    VON_KRIES_M = np.asarray(
+    VON_KRIES_M = np.array(
         (
             (0.40024, -0.2263, 0.0),
             (0.70760, 1.16532, 0.0),
@@ -17,7 +17,7 @@ class LMS(CS):
         ),
         dtype=np.float64,
     )
-    VON_KRIES_M_INV = np.asarray(
+    VON_KRIES_M_INV = np.array(
         (
             (1.8599364, 0.3611914, 0.0),
             (-1.1293816, 0.6388125, 0.0),

@@ -3,7 +3,7 @@ from . import CS, FArray
 import numpy as np
 
 
-M_LMS = np.asarray(
+M_LMS = np.array(
     (
         (0.674207838, 0.149284160, 0.070941080),
         (0.382799340, 0.739628340, 0.174768000),
@@ -12,7 +12,7 @@ M_LMS = np.asarray(
     dtype=np.float64,
 )
 
-M_LMS_INV = np.asarray(
+M_LMS_INV = np.array(
     (
         (
             +1.661373055774069e00,
@@ -33,7 +33,7 @@ M_LMS_INV = np.asarray(
     dtype=np.float64,
 )
 
-M_IAZ = np.asarray(
+M_IAZ = np.array(
     (
         (0.5, 3.524000, 0.199076),
         (0.5, -4.066708, 1.096799),
@@ -42,7 +42,7 @@ M_IAZ = np.asarray(
     dtype=np.float64,
 )
 
-M_IAZ_INV = np.asarray(
+M_IAZ_INV = np.array(
     (
         (1.0, 1.0, 1.0),
         (1.386050432715393e-1, -1.386050432715393e-1, -9.601924202631895e-2),

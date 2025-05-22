@@ -86,7 +86,7 @@ def iCAM06_blur(img: FArray, d: int) -> FArray:
 
 def iCAM06_disp(XYZ_tm: FArray) -> FArray:
     XYZ_tm = XYZ_tm / np.max(XYZ_tm[:, :, 1])
-    M = np.asarray(
+    M = np.array(
         (
             (3.2407, -0.9693, 0.0556),
             (-1.5373, 1.8760, -0.2040),
@@ -158,7 +158,7 @@ def iCAM06_invcat(XYZ_img: FArray) -> FArray:
     # Feb. 22, 2006
 
     # First things first...define the XYZ to RGB transform again using the CIECAM02 transform
-    M = np.asarray(
+    M = np.array(
         (
             (0.8562, 0.3372, -0.1934),
             (-0.8360, 1.8327, 0.0033),
@@ -169,12 +169,12 @@ def iCAM06_invcat(XYZ_img: FArray) -> FArray:
 
     Mi = np.linalg.inv(M)
 
-    xyz_d65 = np.asarray((95.05, 100.0, 108.88), dtype=np.float64)
+    xyz_d65 = np.array((95.05, 100.0, 108.88), dtype=np.float64)
     RGB_d65 = changeColorSpace(xyz_d65, M)
 
     # sRGB Output
     # For general PC user (Uncomment this part)
-    whitepoint = np.asarray((95.05, 100.0, 108.88), dtype=np.float64)
+    whitepoint = np.array((95.05, 100.0, 108.88), dtype=np.float64)
 
     RGB_white = changeColorSpace(whitepoint, M)
     RGB_img = changeColorSpace(XYZ_img, M)
@@ -195,7 +195,7 @@ def iCAM06_IPT(XYZ_img: FArray, base_img: FArray, gamma: float):
     # Feb. 22, 2006
 
     # transform into IPT space
-    xyz2lms = np.asarray(
+    xyz2lms = np.array(
         (
             (0.4002, 0.7077, -0.0807),
             (-0.2280, 1.1500, 0.0612),
@@ -203,7 +203,7 @@ def iCAM06_IPT(XYZ_img: FArray, base_img: FArray, gamma: float):
         ),
         dtype=np.float64,
     )
-    iptMat = np.asarray(
+    iptMat = np.array(
         (
             (0.4000, 0.4000, 0.2000),
             (4.4550, -4.8510, 0.3960),
@@ -272,7 +272,7 @@ def iCAM06_TC(XYZ_adapt: FArray, white_img: FArray, p: float) -> FArray:
     # Feb. 20, 2006
 
     # transform the adapted XYZ to Hunt-Pointer-Estevez space
-    M = np.asarray(
+    M = np.array(
         (
             (0.38971, 0.68898, -0.07868),
             (-0.22981, 1.18340, 0.04641),
@@ -419,7 +419,7 @@ def iCAM06_CAT(XYZimg: FArray, white: FArray) -> FArray:
     # Feb. 20, 2006
 
     # First things first...define the XYZ to RGB transform
-    M = np.asarray(
+    M = np.array(
         (
             (0.7328, 0.4296, -0.1624),
             (-0.7036, 1.6974, 0.0061),
@@ -431,7 +431,7 @@ def iCAM06_CAT(XYZimg: FArray, white: FArray) -> FArray:
     RGB_img = changeColorSpace(XYZimg, M)
 
     RGB_white = changeColorSpace(white, M)
-    xyz_d65 = np.asarray((95.05, 100.0, 108.88), dtype=np.float64)
+    xyz_d65 = np.array((95.05, 100.0, 108.88), dtype=np.float64)
     RGB_d65 = changeColorSpace(xyz_d65, M)
 
     La = 0.2 * white[:, :, 1]
@@ -453,7 +453,7 @@ def rgb_to_xyz_like_in_article(rgb: FArray, max_L: float = 0.0) -> FArray:
     """
     max_L: maximum luminance of the input image, in cd/m2 or nits.
     """
-    M = np.asarray(
+    M = np.array(
         (
             (0.412424, 0.212656, 0.0193324),
             (0.357579, 0.715158, 0.119193),

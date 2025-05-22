@@ -117,7 +117,7 @@ class PCS23UCS(CS):
         assert len(V) == 39, f"{len(V)}"
         assert len(H) == 8, f"{len(H)}"
         self._V = np.vstack((V[:20], np.hstack((np.array(V[20:]), 1.0))))
-        self._H = np.asarray(
+        self._H = np.array(
             (
                 H[:3],
                 H[3:6],

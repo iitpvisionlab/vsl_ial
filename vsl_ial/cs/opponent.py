@@ -8,7 +8,7 @@ class Opponent(CS):
     https://sid.onlinelibrary.wiley.com/doi/pdf/10.1889/1.1985127?casa_token=B5Gc5J-fFsgAAAAA:rgihZLGZbu2AnpZq6_Gxj78PG4fA0Eh4sPpW5A8Pkg4WJ-7J_rkyJhcxGUjMgS02XhFV8JGppZ22CkrZ
     """
 
-    M = np.asarray(
+    M = np.array(
         (
             (0.279, -0.449, 0.086),
             (0.72, 0.29, -0.59),
@@ -17,7 +17,7 @@ class Opponent(CS):
         dtype=np.float64,
     )
 
-    Minv = np.asarray(
+    Minv = np.array(
         (
             (0.62655450425, 1.369855450124, 1.505650754905),
             (-1.867177597834, 0.93475582413, 1.421323771758),

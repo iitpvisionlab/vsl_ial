@@ -3,7 +3,7 @@ from . import CS, FArray
 import numpy as np
 
 
-XYZ_TO_LMS = np.asarray(
+XYZ_TO_LMS = np.array(
     (
         (0.8189330101, 0.0329845436, 0.0482003018),
         (0.3618667424, 0.9293118715, 0.2643662691),
@@ -12,7 +12,7 @@ XYZ_TO_LMS = np.asarray(
     dtype=np.float64,
 )
 
-LMS_TO_LAB = np.asarray(
+LMS_TO_LAB = np.array(
     (
         (0.2104542553, 1.9779984951, 0.0259040371),
         (0.7936177850, -2.4285922050, 0.7827717662),
@@ -21,7 +21,7 @@ LMS_TO_LAB = np.asarray(
     dtype=np.float64,
 )
 
-XYZ_TO_LMS_INV = np.asarray(
+XYZ_TO_LMS_INV = np.array(
     (
         (1.2270138511035211, -0.04058017842328059, -0.07638128450570689),
         (-0.5577999806518223, 1.11225686961683, -0.42148197841801266),
@@ -30,7 +30,7 @@ XYZ_TO_LMS_INV = np.asarray(
     dtype=np.float64,
 )
 
-LMS_TO_LAB_INV = np.asarray(
+LMS_TO_LAB_INV = np.array(
     (
         (0.9999999984505199, 1.0000000088817607, 1.0000000546724108),
         (0.3963377921737679, -0.10556134232365635, -0.08948418209496575),
