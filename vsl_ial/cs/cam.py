@@ -5,14 +5,11 @@ Comprehensive color solutions: CAM16, CAT16, and CAM16-UCS
 from __future__ import annotations
 from abc import abstractmethod
 from . import CS, convert, FArray
-from typing import Optional, Tuple, Union, NamedTuple, ClassVar
-import numpy.typing as npt
+from typing import Tuple, Union, NamedTuple, ClassVar
 import numpy as np
 
 
-# 1. Li et al. (2017) Comprehensive colour solutions: CAM16, CAT16 and CAM16-UCS
-# 2. Green & Habib (2019) Chromatic adaptation in colour management
-M_16 = np.asarray(
+M_16 = np.array(
     (
         (+0.401288, +0.650173, -0.051461),
         (-0.250268, +1.204414, +0.045854),
@@ -20,9 +17,11 @@ M_16 = np.asarray(
     ),
     dtype=np.float64,
 )
+""" 1. Li et al. (2017) Comprehensive colour solutions: CAM16, CAT16 and CAM16-UCS
+2. Green & Habib (2019) Chromatic adaptation in colour management
+"""
 
-# 1. Li et al. (2017) Comprehensive colour solutions: CAM16, CAT16 and CAM16-UCS
-M_16_INV = np.asarray(
+M_16_INV = np.array(
     (
         (+1.86206786, -1.01125463, +0.14918677),
         (+0.38752654, +0.62144744, -0.00897398),
@@ -30,9 +29,10 @@ M_16_INV = np.asarray(
     ),
     dtype=np.float64,
 )
+"""1. Li et al. (2017) Comprehensive colour solutions: CAM16, CAT16 and CAM16-UCS"""
 
 
-M_CAT02 = np.asarray(
+M_CAT02 = np.array(
     (
         (+0.7328, +0.4296, -0.1624),
         (-0.7036, +1.6975, +0.0061),
@@ -42,7 +42,7 @@ M_CAT02 = np.asarray(
 )
 
 
-M_CAT02_INV = np.asarray(
+M_CAT02_INV = np.array(
     (
         (+1.096124, -0.278869, 0.182745),
         (+0.454369, +0.473533, 0.072098),
@@ -51,7 +51,7 @@ M_CAT02_INV = np.asarray(
     dtype=np.float64,
 )
 
-M_HPE = np.asarray(
+M_HPE = np.array(
     (
         (+0.38971, +0.68898, -0.07868),
         (-0.22981, +1.18340, +0.04641),
@@ -64,6 +64,8 @@ M_HPE = np.asarray(
 class Surround(NamedTuple):
     """
     *CIECAM02* colour appearance model induction factors.
+
+    See TABLE A1 Surround parameters
     """
 
     F: float
