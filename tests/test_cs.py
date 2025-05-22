@@ -402,13 +402,9 @@ class TestCaseCSBase:
 
         self._test(
             XYZ(),
-            PCS23UCS(),
+            PCS23UCS(illuminant_xyz=D65, F_LA_or_D=0.8),
             color=[0.12412, 0.07493, 0.3093],
-            ref=[
-                0.37906899651832376,
-                0.44347849030655695,
-                -0.0011813840207282051,
-            ],
+            ref=[0.258536099, 0.480898088, -0.103669807],
         )
 
     def test_cat02(self):
@@ -418,6 +414,7 @@ class TestCaseCSBase:
             illuminant_src=whitepoints_cie1964.D50,
             illuminant_dst=whitepoints_cie1964.D65,
             F_LA_or_D=0.8,
+            exact=False,
         )
         self._test_f(
             cat02,
@@ -429,6 +426,7 @@ class TestCaseCSBase:
             illuminant_src=whitepoints_cie1964.D50,
             illuminant_dst=whitepoints_cie1964.D65,
             F_LA_or_D=(Average.F, 1.1),
+            exact=False,
         )
         self._test_f(
             cat02,
