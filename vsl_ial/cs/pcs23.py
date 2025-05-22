@@ -1,7 +1,38 @@
 from __future__ import annotations
-from . import CS, FArray
-from .ciexyy import CIExyY
 import numpy as np
+from . import CS, FArray, whitepoints_cie1964
+from .ciexyy import CIExyY
+from .cam import CAT16
+
+
+def _rotate_y(xyz: FArray, beta: float) -> FArray:
+    cos_beta = np.cos(beta)
+    sin_beta = np.sin(beta)
+
+    rotation_matrix = np.array(
+        [
+            [cos_beta, 0.0, -sin_beta],
+            [0.0, 1.0, 0.0],
+            [sin_beta, 0.0, cos_beta],
+        ],
+        dtype=np.float64,
+    )
+    return xyz @ rotation_matrix
+
+
+def _rotate_z(xyz: FArray, gamma: float) -> FArray:
+    cos_gamma = np.cos(gamma)
+    sin_gamma = np.sin(gamma)
+
+    rotation_matrix = np.array(
+        [
+            [cos_gamma, sin_gamma, 0.0],
+            [-sin_gamma, cos_gamma, 0.0],
+            [0.0, 0.0, 1.0],
+        ],
+        dtype=np.float64,
+    )
+    return xyz @ rotation_matrix
 
 
 class PCS23UCS(CS):
@@ -16,6 +47,10 @@ class PCS23UCS(CS):
     Springer Nature Group, Lecture Notes in Computer Science (LNCS),
     2024, vol. 15193, ISSN 0302-9743, ISBN 978-3-031-72844-0, no 15193,
     pp. 36-50, 2025, DOI: 10.1007/978-3-031-72845-7_3.
+
+    Main differences are:
+    * input XYZ range [0, 1], and not [0, 100];
+    * output range [-1, 1], and not [-100, 100].
     """
 
     DEFAULT_V = (
@@ -73,9 +108,10 @@ class PCS23UCS(CS):
 
     def __init__(
         self,
+        F_LA_or_D: tuple[float, float] | float,
+        illuminant_xyz: FArray = whitepoints_cie1964.D65,
         V: tuple[float, ...] = DEFAULT_V,
         H: tuple[float, ...] = DEFAULT_H,
-        illuminant_xyz: FArray | None = None,
     ):
         super().__init__(illuminant_xyz)
         assert len(V) == 39, f"{len(V)}"
@@ -88,12 +124,32 @@ class PCS23UCS(CS):
                 np.hstack((np.asarray(H[6:8]), 1)),
             )
         )
+        E = np.array((0.01, 0.01, 0.01))
+        self._cat16 = CAT16(
+            illuminant_src=illuminant_xyz,
+            illuminant_dst=E,
+            F_LA_or_D=F_LA_or_D,
+        )
+        self._white_point = self._convert(E)
 
     @staticmethod
     def _Tc(h: FArray) -> FArray:
         return h / h[-1]
 
     def from_XYZ(self, src: CS, color: FArray) -> FArray:
+        color = self._cat16(color)
+        raw_pcones = self._convert(color)
+        k = 1.0 / np.linalg.norm(self._white_point)
+        scaled_pcones = k * raw_pcones
+        scaled_wp = k * self._white_point
+        a_angle = np.arctan2(scaled_wp[2], scaled_wp[0])
+        pcones_rot_y = _rotate_y(scaled_pcones, a_angle)
+        wp_rot_y = _rotate_y(scaled_wp, a_angle)
+        b_angle = -np.arctan2(wp_rot_y[1], wp_rot_y[0])
+        pcones = _rotate_z(pcones_rot_y, b_angle)
+        return pcones
+
+    def _convert(self, color: FArray) -> FArray:
         xyY = CIExyY().from_XYZ(self, color)
         x, y, Y = xyY.T
         x = x.reshape(-1)
@@ -105,7 +161,7 @@ class PCS23UCS(CS):
         y_sq = np.square(y)
         yY_sq = np.square(yY)
 
-        # WARNING! the order is not like on formula 6, but as in values table
+        # NOTE! the order is not like in formula 6, but as in values table
         thp33 = np.vstack(
             (
                 x,
