@@ -95,10 +95,14 @@ class CAMCommon(CS):
         Y_b: float,
         surround: Surround,
     ):
+        """
+        L_A: Luminance of test adapting field :math:`cd/m^2`
+        Y_b: Luminous factor of background in percent. Typical value is 20.
+        """
         super().__init__(illuminant_xyz)
         assert 0.525 <= surround.c <= 0.69
         self.surround = surround
-        self.n = Y_b / illuminant_xyz[..., 1]
+        self.n = Y_b * 0.01 / illuminant_xyz[..., 1]
         self.z = 1.48 + np.sqrt(self.n)
 
         self.N_bb = 0.725 * self.n**-0.2
@@ -106,9 +110,9 @@ class CAMCommon(CS):
 
         self.N_cb = self.N_bb
 
-        k = 1.0 / (500.0 * L_A + 1.0)
+        k = 1.0 / (5.0 * L_A + 1.0)
         k4 = 0.0 if np.isinf(L_A) else k**4
-        self.F_L = k4 * L_A + 0.1 * (1.0 - k4) ** 2 * np.cbrt(500.0 * L_A)
+        self.F_L = k4 * L_A + 0.1 * (1.0 - k4) ** 2 * np.cbrt(5.0 * L_A)
         self.F_L_root4 = self.F_L**0.25
 
         self.D_RGB = self.calc_d_rgb(
@@ -128,6 +132,9 @@ class CAMCommon(CS):
         pass
 
     def from_XYZ(self, src: CS, color: FArray) -> FArray:
+        """
+        Returns JMh coordinates
+        """
         rgb_a_, A = self._postadaptation_cone_response(color)
         return self._calculate_jmh(rgb_a_, A).reshape(color.shape)
 
@@ -229,7 +236,9 @@ class CAMCommon(CS):
             # of the input sample
             #
             F, L_A = F_LA_or_D
-            D = F * (1.0 - np.exp((-L_A - 0.42) / 0.92) / 3.6)
+            D = F * (1.0 - np.exp((-L_A - 42.0) / 92.0) / 3.6)
+            # If D is greater than one or less than zero,
+            # set it to one or zero, respectively.
             D = np.clip(D, 0.0, 1.0)
         else:
             D = F_LA_or_D

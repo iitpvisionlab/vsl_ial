@@ -260,7 +260,7 @@ class TestCaseCSBase:
 
         self._test(
             XYZ(),
-            CAM16(illuminant_xyz=D65, L_A=0.6, Y_b=0.2, surround=Average),
+            CAM16(illuminant_xyz=D65, L_A=60, Y_b=20, surround=Average),
             color=[0.12412, 0.07493, 0.3093],
             ref=[0.254849690045, 0.507680464129, np.radians(310.433972897)],
         )
@@ -275,7 +275,7 @@ class TestCaseCSBase:
         from vsl_ial.cs.cam import CAM16
 
         self._test(
-            CAM16(illuminant_xyz=D65, L_A=0.6, Y_b=0.2, surround=Average),
+            CAM16(illuminant_xyz=D65, L_A=60, Y_b=20, surround=Average),
             XYZ(),
             color=[0.254849690045, 0.507680464129, np.radians(310.433972897)],
             ref=[0.12412, 0.07493, 0.3093],
@@ -286,7 +286,7 @@ class TestCaseCSBase:
 
         self._test(
             XYZ(),
-            CAM16UCS(illuminant_xyz=D65, L_A=0.6, Y_b=0.2, surround=Average),
+            CAM16UCS(illuminant_xyz=D65, L_A=60, Y_b=20, surround=Average),
             color=[0.12412, 0.07493, 0.3093],
             ref=[0.3676564758394433, 0.21873792289758843, -0.2567076432448853],
         )
@@ -295,7 +295,7 @@ class TestCaseCSBase:
         from vsl_ial.cs.cam import CAM16UCS
 
         self._test(
-            CAM16UCS(illuminant_xyz=D65, L_A=0.6, Y_b=0.2, surround=Average),
+            CAM16UCS(illuminant_xyz=D65, L_A=60, Y_b=20, surround=Average),
             XYZ(),
             color=[
                 0.3676564758394433,
@@ -342,7 +342,7 @@ class TestCaseCSBase:
 
         self._test(
             XYZ(),
-            CAM02(illuminant_xyz=D65, L_A=0.6, Y_b=0.2, surround=Average),
+            CAM02(illuminant_xyz=D65, L_A=60, Y_b=20, surround=Average),
             color=[0.12412, 0.07493, 0.3093],
             ref=[0.246880325931, 0.484522681528, np.radians(299.40091582)],
         )
@@ -351,7 +351,7 @@ class TestCaseCSBase:
         from vsl_ial.cs.cam import CAM02
 
         self._test(
-            CAM02(illuminant_xyz=D65, L_A=0.6, Y_b=0.2, surround=Average),
+            CAM02(illuminant_xyz=D65, L_A=60, Y_b=20, surround=Average),
             XYZ(),
             color=[0.246880325931, 0.484522681528, np.radians(299.40091582)],
             ref=[0.12412, 0.07493, 0.3093],
@@ -425,7 +425,7 @@ class TestCaseCSBase:
         cat02 = CAT02(
             illuminant_src=whitepoints_cie1964.D50,
             illuminant_dst=whitepoints_cie1964.D65,
-            F_LA_or_D=(Average.F, 1.1),
+            F_LA_or_D=(Average.F, 110.0),
             exact=False,
         )
         self._test_f(
