@@ -23,9 +23,7 @@ class TestCaseDistanceBase:
     def test_CAM16LCD_distance(self):
         from vsl_ial.cs.cam import CAM16LCD
 
-        cs = CAM16LCD(
-            illuminant_xyz=D65 * 100.0, L_A=60.0, Y_b=20.0, surround=Average
-        )
+        cs = CAM16LCD(illuminant_xyz=D65, L_A=60.0, Y_b=20.0, surround=Average)
         self._test(
             cs, [0.12412, 0.07493, 0.3093], [0.12412, 0.07493, 0.3093], 0.0
         )
