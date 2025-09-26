@@ -261,10 +261,11 @@ class _CATBase:
         D_RGB = CAMCommon.calc_d_rgb(
             self.M, illuminant_src, illuminant_dst, F_LA_or_D
         )
-        if exact:
-            self._M = (np.linalg.solve(self.M, (self.M.T * D_RGB).T)).T
-        else:
-            self._M = (self.M_INV @ (self.M.T * D_RGB).T).T
+        self._M = (
+            (np.linalg.solve(self.M, (self.M.T * D_RGB).T)).T
+            if exact
+            else (self.M_INV @ (self.M.T * D_RGB).T).T
+        )
 
     def __call__(self, xyz: FArray):
         return xyz @ self._M
