@@ -29,7 +29,7 @@ class linRGB(CS):
         super().__init__()
 
     def from_XYZ(self, src: CS, color: FArray) -> FArray:
-        assert src.__class__.__name__ == "XYZ"
+        # assert src.__class__.__name__ == "XYZ"
         return color @ LIN_RGB_MATRIX
 
     def from_sRGB(self, src: CS, color: FArray) -> FArray:

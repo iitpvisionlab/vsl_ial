@@ -1,0 +1,9 @@
+{
+    "datasets": [
+        {"name": "combvd"},
+        {"name": "munsell"}
+    ],
+    "loss": {
+        "name": "group_stress"
+    }
+}

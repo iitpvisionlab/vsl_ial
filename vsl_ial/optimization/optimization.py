@@ -1,22 +1,141 @@
 from __future__ import annotations
-from typing import Callable, TypeAlias, Any
+from typing import Callable, TypeAlias, Any, Literal
 from pathlib import Path
 from collections.abc import Sequence
 
 import json5
 from .config import Config
-from vsl_ial.cs.pcs23 import PCS23UCS
 from vsl_ial import FArray
+from vsl_ial.cs.pcs23 import PCS23UCS, CS
+from vsl_ial.datasets.sensitivities import load as load_sensitivity
+from vsl_ial.stress import Ord
+from vsl_ial.cs.xyz import XYZ
+from vsl_ial.cs.srgb import sRGB
+from vsl_ial.cs.linrgb import linRGB
+from vsl_ial.cs.ciexyy import CIExyY
 from scipy.optimize import minimize
 from .dataset import Dataset
 import numpy as np
-from vsl_ial.stress import Ord
+import viser
+
 
 Float = np.floating[Any]
+F32Array = np.ndarray[Any, np.dtype(np.float32)]
 
 LossFunction: TypeAlias = Callable[
     [Sequence[FArray], Sequence[FArray], Ord], Float
 ]
+
+server = viser.ViserServer()
+
+
+def _point_inside(x: float, y: float, poly: list[tuple[float, float]]):
+    """
+    ToDo: this is a very slow function.
+          Can be optimized 100x after this module is working
+    """
+    n = len(poly)
+    inside = False
+    p2x = 0.0
+    p2y = 0.0
+    xints = 0.0
+    p1x, p1y = poly[0]
+    for i in range(n + 1):
+        p2x, p2y = poly[i % n]
+        if y > min(p1y, p2y):
+            if y <= max(p1y, p2y):
+                if x <= max(p1x, p2x):
+                    if p1y != p2y:
+                        xints = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
+                    if p1x == p2x or x <= xints:
+                        inside = not inside
+        p1x, p1y = p2x, p2y
+    return inside
+
+
+def plot_colors_srgb(colors) -> None:
+    # return
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots(figsize=(15, 8))
+    for i, color in enumerate(colors):
+        ax.add_patch(plt.Rectangle((i, 0), 1, 1, color=color))
+
+    ax.set_xlim(0, len(colors))
+    ax.set_ylim(0, 1)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_title(f"{len(colors)} Color Swatches")
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_colors_XYZ(colors) -> None:
+    plot_colors_srgb(sRGB().from_XYZ(None, colors).reshape(-1, 3))
+
+
+def scatter_XYZ(colors) -> None:
+    colors = colors.reshape(-1, 3)
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots(figsize=(12, 12))
+    X, Y, Z = colors.T
+    RGB = sRGB().from_XYZ(None, colors).reshape(-1, 3)
+    ax.scatter(x=X, y=Z, c=RGB)
+    ax.set_title(f"")
+    plt.tight_layout()
+    plt.show()
+
+
+class MonotonicityLoss:
+    def __init__(self) -> None:
+        full_xy_grid = self._create_grid(
+            np.linspace(0, 1, 201, dtype=np.float32),
+            np.linspace(0, 1, 201, dtype=np.float32),
+        )
+        self.Y = Y = np.linspace(0.05, 0.3, 21)
+        self._sensitivity_xyz = sensitivity_xyz = np.asarray(
+            load_sensitivity("cie-1931-2")["xyz"], dtype=np.float64
+        ).T
+        spectral_locus_xy = (
+            CIExyY().from_XYZ(XYZ(), sensitivity_xyz)[:, :2].tolist()
+        )
+        xy_points = np.asarray(
+            [
+                pt
+                for pt in full_xy_grid
+                if _point_inside(*pt.tolist(), spectral_locus_xy)
+            ],
+            dtype=np.float32,
+        )
+        xy_points_repeated = xy_points[None].repeat(Y.size, 0)
+        n_points = len(xy_points)
+        xyY = np.dstack(
+            (xy_points_repeated, Y.repeat(n_points).reshape(-1, n_points, 1))
+        )
+        self.XYZ_diff = CIExyY().to_XYZ(XYZ(), xyY)
+
+    def __call__(self, cs: CS) -> float:
+        """
+        Formula 10 of PCS23-UCS
+        """
+        self.visualize_PCS23 = res = cs.from_XYZ(None, self.XYZ_diff)
+        minimum_diff = 0.0
+        L_plus = res[..., 2]
+        θ = float(
+            np.mean(
+                np.maximum(
+                    0,
+                    -np.diff(L_plus, axis=0) / np.diff(self.Y)[..., None]
+                    + minimum_diff,
+                )
+            )
+        )
+        return θ
+
+    @staticmethod
+    def _create_grid(x: F32Array, y: F32Array) -> F32Array:
+        return np.dstack(np.meshgrid(x, y, indexing="ij")).reshape(-1, 2)
 
 
 def train(
@@ -24,14 +143,38 @@ def train(
     loaded_datasets: list[list[Dataset]],
     loss_function: LossFunction,
 ) -> None:
+    monotonicity_loss = MonotonicityLoss()
+
+    RGB_colors = (
+        linRGB()
+        .from_XYZ(None, monotonicity_loss._sensitivity_xyz)
+        .reshape(-1, 3)
+    )
+
+    server.scene.add_point_cloud(
+        name="/sensitivity",
+        points=monotonicity_loss._sensitivity_xyz,
+        colors=RGB_colors,
+        point_size=0.03,
+    )
 
     def evaluate(x: list[float]) -> float:
-        model = model_cls(x[:39], H=x[39:])
+        #
         ref: list[FArray] = []
         exp: list[FArray] = []
+        opt_model = model_cls(
+            F_LA_or_D=0.0, illuminant_xyz=None, V=x[:39], H=x[39:]
+        )
 
         for datasets in loaded_datasets:
             for dataset in datasets:
+                assert dataset.F is not None, dataset
+                model = model_cls(
+                    F_LA_or_D=(dataset.F, dataset.L_A),
+                    illuminant_xyz=np.asarray(dataset.illuminant),
+                    V=x[:39],
+                    H=x[39:],
+                )
                 model_coordinates = model.from_XYZ(None, dataset.xyz)
                 a_colors = np.empty((len(dataset.pairs), 3), dtype=np.float64)
                 b_colors = np.empty_like(a_colors)
@@ -43,86 +186,103 @@ def train(
                 )
                 exp.append(exp_distance)
                 ref.append(dataset.dv)
-        loss = loss_function(ref, exp)
-        print("loss function", loss)
+        monotonicity = monotonicity_loss(opt_model)
+        stress = loss_function(ref, exp)
+        loss = stress + 0.5 * monotonicity
+        print(f"{stress=}, {monotonicity=}, {loss=}")
+
+        #
+        # visualize
+        #
+
+        vis_pcs23 = opt_model.from_XYZ(
+            None, monotonicity_loss._sensitivity_xyz
+        )
+        server.scene.add_point_cloud(
+            name="/pcs23",
+            points=vis_pcs23,
+            colors=RGB_colors,
+            point_size=0.03,
+        )
         return loss
 
     # x0 = [0.2] * (39 + 8)
     # x0 = np.random.rand(39 + 8)
     x0 = np.asarray(
         [
-            5.65822087e00,
-            1.75511708e02,
-            1.16367546e03,
-            -2.00084521e-03,
-            -5.05773364e02,
-            -1.36521727e05,
-            -5.89062148e02,
-            -2.64563249e04,
-            -9.57581167e03,
-            2.35986631e02,
-            6.55043332e02,
-            4.46391903e-01,
-            1.58078875e03,
-            1.24616075e04,
-            -1.34185422e00,
-            1.78546715e05,
-            2.19355970e02,
-            -9.81213831e04,
-            -5.46287245e02,
-            1.88035463e00,
-            3.18578603e00,
-            -5.09896100e00,
-            8.85655496e02,
-            7.94394362e-01,
-            1.76772051e01,
-            -1.73650355e02,
-            -3.29927222e01,
-            -8.72088578e03,
-            2.35704637e03,
-            3.77036132e01,
-            -2.88774290e01,
-            -1.03504007e03,
-            9.84241706e01,
-            3.32752406e00,
-            -4.28197266e02,
-            2.31725935e04,
-            -6.81158416e01,
-            9.27573345e02,
-            -9.31335222e01,
-            3.79644431e02,
-            -9.22254559e01,
-            -8.04988702e01,
-            -8.18506374e01,
-            3.74275903e02,
-            -1.15349017e02,
-            -4.35768649e01,
-            1.68770308e02,
+            5.62377545903092,
+            171.36368020069722,
+            1139.5284167730447,
+            -0.0020158707793063793,
+            -518.7569550219694,
+            -137924.3491321199,
+            -778.9657975296375,
+            -27033.789978479195,
+            -9803.553621070627,
+            231.03532437905437,
+            644.7093156808708,
+            0.44725829317373944,
+            1552.67428101527,
+            12385.40992041996,
+            -1.3479048145608292,
+            175294.8272608068,
+            217.6718130425752,
+            -100733.5963017536,
+            -551.1602008733025,
+            1.8733545835396264,
+            3.2401865056285963,
+            -5.037047974757915,
+            904.8509895568436,
+            0.8076667483450888,
+            17.92102636270046,
+            -172.92820638970534,
+            -30.23187778315493,
+            -9447.097080971176,
+            2405.2096148027103,
+            38.666799865781016,
+            -29.211639266195263,
+            -1034.5453785483978,
+            99.82711165184196,
+            3.3476225751147854,
+            -427.2206444638241,
+            23555.99281961212,
+            -67.88828249203013,
+            940.1148914054388,
+            -92.37431872163927,
+            373.63658287545445,
+            -93.78291385820899,
+            -82.47410662677822,
+            -85.44966655764117,
+            382.8830618784323,
+            -114.0144951964989,
+            -42.61604476329086,
+            171.52341864142795,
         ]
     )
-    # np.random.shuffle(x0)
+    np.random.shuffle(x0)
+    x0 = -x0 + (x0 + 1) * 0.2
     for i in range(5):
         res = minimize(
             fun=evaluate,
             method="Nelder-Mead",
             x0=x0,
-            tol=1e-4,
-            options={"maxiter": 2000},
+            tol=1e-2,
+            options={"maxiter": 150, "maxfev": 150},
         )
+        print(f"step {i+1}: ", res.x.tolist())
         x0 = res.x
-    breakpoint()
     print("minimization result", res)
 
 
-def get_xyz():
-    with open(
-        "/home/senyai/projects/vsl_ial/vsl_ial/datasets/ciexyz31_1.csv"
-    ) as f:
-        lines: list[tuple[int, float, float, float]] = []
-        for line in f:
-            wl, x, y, z = line.split(",")
-            lines.append((int(wl), float(x), float(y), float(z)))
-    return lines
+# def get_xyz():
+#     with open(
+#         "/home/senyai/projects/vsl_ial/vsl_ial/datasets/ciexyz31_1.csv"
+#     ) as f:
+#         lines: list[tuple[int, float, float, float]] = []
+#         for line in f:
+#             wl, x, y, z = line.split(",")
+#             lines.append((int(wl), float(x), float(y), float(z)))
+#     return lines
 
 
 def main():
