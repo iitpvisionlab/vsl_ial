@@ -21,12 +21,14 @@ class Dataset(NamedTuple):
     xyz: FArray  # list[tuple[float, float, float]]
     pairs: list[tuple[int, int]]
     dv: list[float]
+    weight: float
 
 
 dataset_root = Path(__file__).parents[1] / "datasets"
 
 
 class BaseDataset(StrictModel):
+    weight: float  # = 1.0
     # name: ClassVar[Literal["bfd_p", "ebner_fairchild", "fairchild_chen", "hung_berns", "illuminants", "leeds", "luo_rigg", "macadam_1942", "macadam_1974", "mrr", "munsell", "observers", "rit_dupont", "witt", "xiao", "combvd"]]
 
     def load(self) -> list[Dataset]:
@@ -46,8 +48,7 @@ class JsonDataset(BaseDataset):
         assert isinstance(self.name, str)
         return [self.load_json(self.path, self.name)]
 
-    @staticmethod
-    def load_json(path: Path, name: str) -> Dataset:
+    def load_json(self, path: Path, name: str) -> Dataset:
         text = path.read_text()
         data = json5.loads(text)
         assert len(data["dv"]) == len(data["pairs"]), "dataset error"
@@ -62,6 +63,7 @@ class JsonDataset(BaseDataset):
             xyz=np.asarray(data["xyz"], dtype=np.float64),
             pairs=data["pairs"],
             dv=np.asarray(data["dv"], dtype=np.float64),
+            weight=self.weight,
         )
 
 
@@ -207,10 +209,11 @@ class DatasetMunsell(BaseDataset):
             next(f)
             for line in f:
                 row = self.Row.from_line(line)
-                groups[(f"h={row.H}_v={row.V}", self.key_c)].append(row)
-                if row.C != 0:
-                    groups[(f"v={row.V}_c={row.C}", self.key_h)].append(row)
-                groups[(f"h={row.H}_c={row.C}", self.key_v)].append(row)
+                # groups[(f"h={row.H}_v={row.V}", self.key_c)].append(row)
+                # if row.C != 0:
+                #     groups[(f"v={row.V}_c={row.C}", self.key_h)].append(row)
+                if 18 <= row.C <= 32:
+                    groups[(f"h={row.H}_c={row.C}", self.key_v)].append(row)
 
         ret: list[Dataset] = []
         for key, group in groups.items():
@@ -221,8 +224,7 @@ class DatasetMunsell(BaseDataset):
                 )
         return ret
 
-    @staticmethod
-    def group_as_dataset(key: str, rows: list[Row]) -> Dataset:
+    def group_as_dataset(self, key: str, rows: list[Row]) -> Dataset:
         from vsl_ial.cs import whitepoints_cie1931
         from vsl_ial.cs.ciexyy import CIExyY
 
@@ -244,6 +246,7 @@ class DatasetMunsell(BaseDataset):
             dv=np.asarray([1.0] * n, dtype=np.float64),
             pairs=list(zip(range(n), range(1, n + 1))),
             xyz=xyz,
+            weight=self.weight,
         )
 
 
@@ -277,10 +280,10 @@ class DatasetCombvd(BaseDataset):
     # BFD-P, Leeds, RIT-DuPont, Witt.
     def load(self) -> list[Dataset]:
         return [
-            *DatasetWitt().load(),
-            *DatasetLeeds().load(),
-            *DatasetBfd_p().load(),
-            *DatasetRit_dupont().load(),
+            *DatasetWitt(weight=self.weight).load(),
+            *DatasetLeeds(weight=self.weight).load(),
+            *DatasetBfd_p(weight=self.weight).load(),
+            *DatasetRit_dupont(weight=self.weight).load(),
         ]
 
 

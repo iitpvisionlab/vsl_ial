@@ -13,6 +13,7 @@ from vsl_ial.cs.xyz import XYZ
 from vsl_ial.cs.srgb import sRGB
 from vsl_ial.cs.linrgb import linRGB
 from vsl_ial.cs.ciexyy import CIExyY
+from vsl_ial.cs import convert
 from scipy.optimize import minimize
 from .dataset import Dataset
 import numpy as np
@@ -90,10 +91,10 @@ def scatter_XYZ(colors) -> None:
 class MonotonicityLoss:
     def __init__(self) -> None:
         full_xy_grid = self._create_grid(
-            np.linspace(0, 1, 201, dtype=np.float32),
-            np.linspace(0, 1, 201, dtype=np.float32),
+            np.linspace(0, 1, 30, dtype=np.float32),
+            np.linspace(0, 1, 30, dtype=np.float32),
         )
-        self.Y = Y = np.linspace(0.05, 0.3, 21)
+        self.Y = Y = np.linspace(0.02, 1.0, 49)
         self._sensitivity_xyz = sensitivity_xyz = np.asarray(
             load_sensitivity("cie-1931-2")["xyz"], dtype=np.float64
         ).T
@@ -114,13 +115,16 @@ class MonotonicityLoss:
             (xy_points_repeated, Y.repeat(n_points).reshape(-1, n_points, 1))
         )
         self.XYZ_diff = CIExyY().to_XYZ(XYZ(), xyY)
+        self.xyY_diff = xyY
+        breakpoint()
+        pass
 
     def __call__(self, cs: CS) -> float:
         """
         Formula 10 of PCS23-UCS
         """
         self.visualize_PCS23 = res = cs.from_XYZ(None, self.XYZ_diff)
-        minimum_diff = 0.0
+        minimum_diff = 0.02
         L_plus = res[..., 2]
         θ = float(
             np.mean(
@@ -158,15 +162,38 @@ def train(
         point_size=0.03,
     )
 
+    DBG = monotonicity_loss.XYZ_diff
+    DBG = DBG[len(DBG) // 2]
+    x, y, _ = (
+        DBG.reshape(-1, 3) / np.sum(DBG.reshape(-1, 3), axis=-1)[:, None]
+    ).T
+    xyY = np.column_stack((x, y, np.full_like(x, fill_value=0.4)))
+
+    RGB_colors_2 = convert(
+        src=CIExyY(),
+        dst=linRGB(),
+        color=DBG.reshape(-1, 3),
+    )
+
+    server.scene.add_point_cloud(
+        name="/XYZ_diff",
+        points=xyY,
+        colors=RGB_colors_2,
+        point_size=0.01,
+    )
+    breakpoint()
+
     def evaluate(x: list[float]) -> float:
         #
-        ref: list[FArray] = []
-        exp: list[FArray] = []
         opt_model = model_cls(
-            F_LA_or_D=0.0, illuminant_xyz=None, V=x[:39], H=x[39:]
+            F_LA_or_D=0.0, illuminant_xyz=None  # , V=x[:39], H=x[39:]
         )
 
+        stress = 0.0
         for datasets in loaded_datasets:
+            ref: list[FArray] = []
+            exp: list[FArray] = []
+            print("=" * 40)
             for dataset in datasets:
                 assert dataset.F is not None, dataset
                 model = model_cls(
@@ -186,10 +213,13 @@ def train(
                 )
                 exp.append(exp_distance)
                 ref.append(dataset.dv)
+                print(dataset.name)
+            print(f"!!! {len(ref)=}")
+            stress += loss_function(ref, exp) * dataset.weight
         monotonicity = monotonicity_loss(opt_model)
-        stress = loss_function(ref, exp)
-        loss = stress + 0.5 * monotonicity
+        loss = stress + 0.1 * monotonicity
         print(f"{stress=}, {monotonicity=}, {loss=}")
+        breakpoint()
 
         #
         # visualize
@@ -208,59 +238,60 @@ def train(
 
     # x0 = [0.2] * (39 + 8)
     # x0 = np.random.rand(39 + 8)
-    x0 = np.asarray(
-        [
-            5.62377545903092,
-            171.36368020069722,
-            1139.5284167730447,
-            -0.0020158707793063793,
-            -518.7569550219694,
-            -137924.3491321199,
-            -778.9657975296375,
-            -27033.789978479195,
-            -9803.553621070627,
-            231.03532437905437,
-            644.7093156808708,
-            0.44725829317373944,
-            1552.67428101527,
-            12385.40992041996,
-            -1.3479048145608292,
-            175294.8272608068,
-            217.6718130425752,
-            -100733.5963017536,
-            -551.1602008733025,
-            1.8733545835396264,
-            3.2401865056285963,
-            -5.037047974757915,
-            904.8509895568436,
-            0.8076667483450888,
-            17.92102636270046,
-            -172.92820638970534,
-            -30.23187778315493,
-            -9447.097080971176,
-            2405.2096148027103,
-            38.666799865781016,
-            -29.211639266195263,
-            -1034.5453785483978,
-            99.82711165184196,
-            3.3476225751147854,
-            -427.2206444638241,
-            23555.99281961212,
-            -67.88828249203013,
-            940.1148914054388,
-            -92.37431872163927,
-            373.63658287545445,
-            -93.78291385820899,
-            -82.47410662677822,
-            -85.44966655764117,
-            382.8830618784323,
-            -114.0144951964989,
-            -42.61604476329086,
-            171.52341864142795,
-        ]
-    )
-    np.random.shuffle(x0)
-    x0 = -x0 + (x0 + 1) * 0.2
+    # x0 = np.asarray(
+    #     [
+    #         5.62377545903092,
+    #         171.36368020069722,
+    #         1139.5284167730447,
+    #         -0.0020158707793063793,
+    #         -518.7569550219694,
+    #         -137924.3491321199,
+    #         -778.9657975296375,
+    #         -27033.789978479195,
+    #         -9803.553621070627,
+    #         231.03532437905437,
+    #         644.7093156808708,
+    #         0.44725829317373944,
+    #         1552.67428101527,
+    #         12385.40992041996,
+    #         -1.3479048145608292,
+    #         175294.8272608068,
+    #         217.6718130425752,
+    #         -100733.5963017536,
+    #         -551.1602008733025,
+    #         1.8733545835396264,
+    #         3.2401865056285963,
+    #         -5.037047974757915,
+    #         904.8509895568436,
+    #         0.8076667483450888,
+    #         17.92102636270046,
+    #         -172.92820638970534,
+    #         -30.23187778315493,
+    #         -9447.097080971176,
+    #         2405.2096148027103,
+    #         38.666799865781016,
+    #         -29.211639266195263,
+    #         -1034.5453785483978,
+    #         99.82711165184196,
+    #         3.3476225751147854,
+    #         -427.2206444638241,
+    #         23555.99281961212,
+    #         -67.88828249203013,
+    #         940.1148914054388,
+    #         -92.37431872163927,
+    #         373.63658287545445,
+    #         -93.78291385820899,
+    #         -82.47410662677822,
+    #         -85.44966655764117,
+    #         382.8830618784323,
+    #         -114.0144951964989,
+    #         -42.61604476329086,
+    #         171.52341864142795,
+    #     ]
+    # )
+    # np.random.shuffle(x0)
+    # x0 = -x0 + (x0 + 1) * 0.2
+    x0 = np.array(PCS23UCS.DEFAULT_V + PCS23UCS.DEFAULT_H)
     for i in range(5):
         res = minimize(
             fun=evaluate,

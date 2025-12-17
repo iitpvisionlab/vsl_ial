@@ -1,7 +1,13 @@
 {
     "datasets": [
-        {"name": "combvd"},
-        {"name": "munsell"}
+        {
+            "name": "combvd",
+            "weight": 1.0
+        },
+        {
+            "name": "munsell",
+            "weight": 0.8
+        }
     ],
     "loss": {
         "name": "group_stress"
