@@ -69,184 +69,237 @@ class TestCaseCSBase:
         self._test(
             XYZ(),
             sRGB(),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[0.4, 0.2, 0.6],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.36171007855, 0.7172837833, 0.11938578030],
+            ref0=[0.4, 0.2, 0.6],
+            ref1=[0.1, 1.0, 0.0],
         )
 
     def test_XYZ_to_linRGB(self):
         self._test(
             XYZ(),
             linRGB(),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[0.13287, 0.0331, 0.31855],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.36171007855, 0.7172837833, 0.11938578030],
+            ref0=[0.13287, 0.0331, 0.31855],
+            ref1=[0.010022864290, 1.0, 0.0],
         )
 
     def test_XYZ_to_LMS(self):
         self._test(
             XYZ(),
             LMS(),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[0.0777, 0.0734, 0.284],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.36171007855, 0.7172837833, 0.11938578030],
+            ref0=[0.0777, 0.0734, 0.284],
+            ref1=[0.642673281, 0.7594660777, 0.109622411],
         )
 
     def test_LMS_to_XYZ(self):
         self._test(
             LMS(),
             XYZ(),
-            color=[0.0777, 0.0734, 0.284],
-            ref=[0.12412, 0.07493, 0.3093],
+            color0=[0.0777, 0.0734, 0.284],
+            color1=[0.642673281, 0.7594660777, 0.109622411],
+            ref0=[0.12412, 0.07493, 0.3093],
+            ref1=[0.36171007855, 0.7172837833, 0.11938578030],
         )
 
     def test_sRGB_to_XYZ(self):
         self._test(
             sRGB(),
             XYZ(),
-            color=[0.4, 0.2, 0.6],
-            ref=[0.12412, 0.07493, 0.3093],
+            color0=[0.4, 0.2, 0.6],
+            color1=[0.1, 1.0, 0.0],
+            ref0=[0.12412, 0.07493, 0.3093],
+            ref1=[0.36171007855, 0.7172837833, 0.11938578030],
         )
 
     def test_sRGB_to_HLS(self):
         from vsl_ial.cs import HLS
         from colorsys import rgb_to_hls
 
-        for color in self.wikipedia_sRGB_colors:
+        color1 = self.wikipedia_sRGB_colors[0]
+        ref1 = rgb_to_hls(*color1)
+
+        for color in self.wikipedia_sRGB_colors[1:]:
             self._test(
                 sRGB(),
                 HLS(),
-                color=color,
-                ref=rgb_to_hls(*color),
+                color0=color,
+                color1=color1,
+                ref0=rgb_to_hls(*color),
+                ref1=ref1,
             )
 
     def test_HSL_to_sRGB(self):
         from vsl_ial.cs import HLS
         from colorsys import rgb_to_hls
 
-        for color in self.wikipedia_sRGB_colors:
+        ref1 = self.wikipedia_sRGB_colors[0]
+        color1 = rgb_to_hls(*ref1)
+
+        for color in self.wikipedia_sRGB_colors[1:]:
             self._test(
                 HLS(),
                 sRGB(),
-                color=rgb_to_hls(*color),
-                ref=color,
+                color0=rgb_to_hls(*color),
+                color1=color1,
+                ref0=color,
+                ref1=ref1,
             )
 
     def test_sRGB_to_HSV(self):
         from vsl_ial.cs import HSV
         from colorsys import rgb_to_hsv
 
-        for color in self.wikipedia_sRGB_colors:
+        color1 = self.wikipedia_sRGB_colors[0]
+        ref1 = rgb_to_hsv(*color1)
+
+        for color in self.wikipedia_sRGB_colors[1:]:
             self._test(
                 sRGB(),
                 HSV(),
-                color=color,
-                ref=rgb_to_hsv(*color),
+                color0=color,
+                color1=color1,
+                ref0=rgb_to_hsv(*color),
+                ref1=ref1,
             )
 
     def test_HSV_to_sRGB(self):
         from vsl_ial.cs import HSV
         from colorsys import rgb_to_hsv
 
-        for color in self.wikipedia_sRGB_colors:
+        ref1 = self.wikipedia_sRGB_colors[0]
+        color1 = rgb_to_hsv(*ref1)
+        for color in self.wikipedia_sRGB_colors[1:]:
             self._test(
                 HSV(),
                 sRGB(),
-                color=rgb_to_hsv(*color),
-                ref=color,
+                color0=rgb_to_hsv(*color),
+                color1=color1,
+                ref0=color,
+                ref1=ref1,
             )
 
     def test_XYZ_to_Jzazbz(self):
         self._test(
             XYZ(),
             JzAzBz(),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[0.00391332, 0.00331202, -0.00905872],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.36171007855, 0.7172837833, 0.11938578030],
+            ref0=[0.00391332, 0.00331202, -0.00905872],
+            ref1=[0.0124749172, -0.016089371215, 0.01661463483],
         )
 
     def test_Jzazbz_to_XYZ(self):
         self._test(
             JzAzBz(),
             XYZ(),
-            color=[0.00391332, 0.00331202, -0.00905872],
-            ref=[0.12412, 0.07493, 0.3093],
+            color0=[0.00391332, 0.00331202, -0.00905872],
+            color1=[0.0124749172, -0.016089371215, 0.01661463483],
+            ref0=[0.12412, 0.07493, 0.3093],
+            ref1=[0.36171007855, 0.7172837833, 0.11938578030],
         )
 
     def test_XYZ_to_Oklab(self):
         self._test(
             XYZ(),
             Oklab(),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[0.44027, 0.08818, -0.13394],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.36171007855, 0.7172837833, 0.11938578030],
+            ref0=[0.44027, 0.08818, -0.13394],
+            ref1=[0.86759324, -0.2317104079, 0.17963248724],
         )
 
     def test_Oklab_to_XYZ(self):
         self._test(
             Oklab(),
             XYZ(),
-            color=[0.44027, 0.08818, -0.13394],
-            ref=[0.12412, 0.07493, 0.3093],
+            color0=[0.44027, 0.08818, -0.13394],
+            color1=[0.86759324, -0.2317104079, 0.17963248724],
+            ref0=[0.12412, 0.07493, 0.3093],
+            ref1=[0.36171007855, 0.7172837833, 0.11938578030],
         )
 
     def test_XYZ_to_ICaCb(self):
         self._test(
             XYZ(),
             ICaCb(),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[0.0561, 0.0172, -0.0513],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.36171007855, 0.7172837833, 0.11938578030],
+            ref0=[0.0561, 0.0172, -0.0513],
+            ref1=[0.13163832448, -0.046759702599, 0.07293014],
         )
 
     def test_ICaCb_to_XYZ(self):
         self._test(
             ICaCb(),
             XYZ(),
-            color=[0.0561, 0.0172, -0.0513],
-            ref=[0.12412, 0.07493, 0.3093],
+            color0=[0.0561, 0.0172, -0.0513],
+            color1=[0.13163832448, -0.046759702599, 0.07293014],
+            ref0=[0.12412, 0.07493, 0.3093],
+            ref1=[0.36171007855, 0.7172837833, 0.11938578030],
         )
 
     def test_XYZ_to_ICtCp(self):
         self._test(
             XYZ(),
             ICtCp(),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[527.4813, 82.1905, -66.3334],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.36171007855, 0.7172837833, 0.11938578030],
+            ref0=[527.4813, 82.1905, -66.3334],
+            ref1=[690.2125025, -111.3910404, -127.348758],
         )
 
     def test_ICtCp_to_XYZ(self):
         self._test(
             ICtCp(),
             XYZ(),
-            color=[527.4813, 82.1905, -66.3334],
-            ref=[0.12412, 0.07493, 0.3093],
+            color0=[527.4813, 82.1905, -66.3334],
+            color1=[690.2125025, -111.3910404, -127.348758],
+            ref0=[0.12412, 0.07493, 0.3093],
+            ref1=[0.36171007855, 0.7172837833, 0.11938578030],
         )
 
     def test_XYZ_to_CIELUV(self):
         self._test(
             XYZ(),
             CIELUV(illuminant_xyz=D65),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[0.329039, 0.129716, -0.677639],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.36171007855, 0.7172837833, 0.11938578030],
+            ref0=[0.329039, 0.129716, -0.677639],
+            ref1=[0.8783768406, -0.819863499, 1.0738000689],
         )
 
     def test_CIELUV_to_XYZ(self):
         self._test(
             CIELUV(illuminant_xyz=D65),
             XYZ(),
-            color=[0.329039, 0.129716, -0.677639],
-            ref=[0.12412, 0.07493, 0.3093],
+            color0=[0.329039, 0.129716, -0.677639],
+            color1=[0.8783768406, -0.819863499, 1.0738000689],
+            ref0=[0.12412, 0.07493, 0.3093],
+            ref1=[0.36171007855, 0.7172837833, 0.11938578030],
         )
 
     def test_XYZ_to_PROLAB(self):
         self._test(
             XYZ(),
             ProLab(illuminant_xyz=D65),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[0.5037, 0.1595, -0.2585],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.36171007855, 0.7172837833, 0.11938578030],
+            ref0=[0.5037, 0.1595, -0.2585],
+            ref1=[0.9333917145, -0.45817234969, 0.30993073925],
         )
 
     def test_PROLAB_to_XYZ(self):
         self._test(
             ProLab(illuminant_xyz=D65),
             XYZ(),
-            color=[0.5037, 0.1595, -0.2585],
-            ref=[0.12412, 0.07493, 0.3093],
+            color0=[0.5037, 0.1595, -0.2585],
+            color1=[0.9333917145, -0.45817234969, 0.30993073925],
+            ref0=[0.12412, 0.07493, 0.3093],
+            ref1=[0.36171007855, 0.7172837833, 0.11938578030],
         )
 
     def test_XYZ_to_CAM16(self):
@@ -261,8 +314,10 @@ class TestCaseCSBase:
         self._test(
             XYZ(),
             CAM16(illuminant_xyz=D65, L_A=60, Y_b=20, surround=Average),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[0.254849690045, 0.507680464129, np.radians(310.433972897)],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.36171007855, 0.7172837833, 0.11938578030],
+            ref0=[0.254849690045, 0.507680464129, np.radians(310.433972897)],
+            ref1=[0.7942661024, 0.9684004744, 2.470480293],
         )
 
     def test_CAM16_to_XYZ(self):
@@ -277,8 +332,10 @@ class TestCaseCSBase:
         self._test(
             CAM16(illuminant_xyz=D65, L_A=60, Y_b=20, surround=Average),
             XYZ(),
-            color=[0.254849690045, 0.507680464129, np.radians(310.433972897)],
-            ref=[0.12412, 0.07493, 0.3093],
+            color0=[0.254849690045, 0.507680464129, np.radians(310.433972897)],
+            color1=[0.7942661024, 0.9684004744, 2.470480293],
+            ref0=[0.12412, 0.07493, 0.3093],
+            ref1=[0.36171007855, 0.7172837833, 0.11938578030],
         )
 
     def test_XYZ_to_CAM16UCS(self):
@@ -287,8 +344,10 @@ class TestCaseCSBase:
         self._test(
             XYZ(),
             CAM16UCS(illuminant_xyz=D65, L_A=60, Y_b=20, surround=Average),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[0.3676564758394433, 0.21873792289758843, -0.2567076432448853],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.36171007855, 0.7172837833, 0.11938578030],
+            ref0=[0.367656475839, 0.2187379228975, -0.256707643244],
+            ref1=[0.8677791049, -0.4003696108, 0.31792002506],
         )
 
     def test_CAM16UCS_to_XYZ(self):
@@ -297,12 +356,10 @@ class TestCaseCSBase:
         self._test(
             CAM16UCS(illuminant_xyz=D65, L_A=60, Y_b=20, surround=Average),
             XYZ(),
-            color=[
-                0.3676564758394433,
-                0.21873792289758843,
-                -0.2567076432448853,
-            ],
-            ref=[0.12412, 0.07493, 0.3093],
+            color0=[0.367656475839, 0.2187379228975, -0.256707643244],
+            color1=[0.8677791049, -0.4003696108, 0.31792002506],
+            ref0=[0.12412, 0.07493, 0.3093],
+            ref1=[0.36171007855, 0.7172837833, 0.11938578030],
         )
 
     def test_XYZ_to_CIELAB(self):
@@ -311,14 +368,10 @@ class TestCaseCSBase:
         self._test(
             XYZ(),
             CIELAB(illuminant_xyz=D65),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[0.329039, 0.428786, -0.47156],
-        )
-        self._test(
-            XYZ(),
-            CIELAB(illuminant_xyz=D65),
-            color=[0.0087, 0.0085, 0.0135],
-            ref=[0.076780185185185, 0.02531210019708, -0.054659059902865],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.0087, 0.0085, 0.0135],
+            ref0=[0.329039, 0.428786, -0.47156],
+            ref1=[0.076780185185185, 0.02531210019708, -0.054659059902865],
         )
 
     def test_CIELAB_to_XYZ(self):
@@ -327,14 +380,10 @@ class TestCaseCSBase:
         self._test(
             CIELAB(illuminant_xyz=D65),
             XYZ(),
-            color=[0.329039 * 1.0, 0.428786 * 1.0, -0.47156 * 1.0],
-            ref=[0.12412, 0.07493, 0.3093],
-        )
-        self._test(
-            CIELAB(illuminant_xyz=D65),
-            XYZ(),
-            color=[0.076780185185185, 0.02531210019708, -0.054659059902865],
-            ref=[0.0087, 0.0085, 0.0135],
+            color0=[0.329039 * 1.0, 0.428786 * 1.0, -0.47156 * 1.0],
+            color1=[0.076780185185185, 0.02531210019708, -0.054659059902865],
+            ref0=[0.12412, 0.07493, 0.3093],
+            ref1=[0.0087, 0.0085, 0.0135],
         )
 
     def test_XYZ_to_CAM02(self):
@@ -343,8 +392,10 @@ class TestCaseCSBase:
         self._test(
             XYZ(),
             CAM02(illuminant_xyz=D65, L_A=60, Y_b=20, surround=Average),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[0.246880325931, 0.484522681528, np.radians(299.40091582)],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.36171007855, 0.7172837833, 0.11938578030],
+            ref0=[0.246880325931, 0.484522681528, np.radians(299.40091582)],
+            ref1=[0.8006454338, 0.9505764278, 2.3723678665],
         )
 
     def test_CAM02_to_XYZ(self):
@@ -353,8 +404,10 @@ class TestCaseCSBase:
         self._test(
             CAM02(illuminant_xyz=D65, L_A=60, Y_b=20, surround=Average),
             XYZ(),
-            color=[0.246880325931, 0.484522681528, np.radians(299.40091582)],
-            ref=[0.12412, 0.07493, 0.3093],
+            color0=[0.246880325931, 0.484522681528, np.radians(299.40091582)],
+            color1=[0.8006454338, 0.9505764278, 2.3723678665],
+            ref0=[0.12412, 0.07493, 0.3093],
+            ref1=[0.36171007855, 0.7172837833, 0.11938578030],
         )
 
     def test_XYZ_to_xyY(self):
@@ -363,8 +416,10 @@ class TestCaseCSBase:
         self._test(
             XYZ(),
             CIExyY(illuminant_xyz=D65),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[0.2441624864758532, 0.1473984459525917, 0.07493],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.3597, 0.7163, 0.1193],
+            ref0=[0.2441624864758532, 0.1473984459525917, 0.07493],
+            ref1=[0.3009286371622187, 0.5992637831506735, 0.7163],
         )
 
     def test_xyY_to_XYZ(self):
@@ -373,8 +428,10 @@ class TestCaseCSBase:
         self._test(
             CIExyY(illuminant_xyz=D65),
             XYZ(),
-            color=[0.2441624864758532, 0.1473984459525917, 0.07493],
-            ref=[0.12412, 0.07493, 0.3093],
+            color0=[0.2441624864758532, 0.1473984459525917, 0.07493],
+            color1=[0.3009286371622187, 0.5992637831506735, 0.7163],
+            ref0=[0.12412, 0.07493, 0.3093],
+            ref1=[0.3597, 0.7163, 0.1193],
         )
 
     def test_XYZ_to_Opponent(self):
@@ -383,8 +440,10 @@ class TestCaseCSBase:
         self._test(
             XYZ(),
             Opponent(),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[0.05548398, -0.05781628, 0.12142492],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.36171007855, 0.7172837833, 0.11938578030],
+            ref0=[0.05548398, -0.05781628, 0.12142492],
+            ref1=[0.6045871573, 0.03641176680, -0.332278089],
         )
 
     def test_Opponent_to_XYZ(self):
@@ -393,8 +452,10 @@ class TestCaseCSBase:
         self._test(
             Opponent(),
             XYZ(),
-            color=[0.05548398, -0.05781628, 0.12142492],
-            ref=[0.12412, 0.07493, 0.3093],
+            color0=[0.05548398, -0.05781628, 0.12142492],
+            color1=[0.6045871573, 0.03641176680, -0.332278089],
+            ref0=[0.12412, 0.07493, 0.3093],
+            ref1=[0.36171007855, 0.7172837833, 0.11938578030],
         )
 
     def test_XYZ_to_PCS23UCS(self):
@@ -403,8 +464,10 @@ class TestCaseCSBase:
         self._test(
             XYZ(),
             PCS23UCS(illuminant_xyz=D65, F_LA_or_D=0.8),
-            color=[0.12412, 0.07493, 0.3093],
-            ref=[0.258536099, 0.480898088, -0.103669807],
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.36171007855, 0.7172837833, 0.11938578030],
+            ref0=[0.258536099, 0.480898088, -0.103669807],
+            ref1=[0.8073134397, -1.63216626, -0.2843612585],
         )
 
     def test_cat02(self):
@@ -440,13 +503,16 @@ class TestCaseCS1D(TestCaseCSBase, unittest.TestCase):
         self,
         src: CS,
         dst: CS,
-        color: npt.ArrayLike,
-        ref: npt.ArrayLike,
+        color0: npt.ArrayLike,
+        color1: npt.ArrayLike,
+        ref0: npt.ArrayLike,
+        ref1: npt.ArrayLike,
     ):
-        color = np.asarray(color)
-        assert color.ndim == 1, color.ndim
-        res_1d = convert(src, dst, color=color)
-        np.testing.assert_almost_equal(res_1d, ref, decimal=4)
+        for color, ref in (color0, ref0), (color1, ref1):
+            color = np.asarray(color)
+            assert color.ndim == 1, color.ndim
+            res_1d = convert(src, dst, color=color)
+            np.testing.assert_almost_equal(res_1d, ref, decimal=4)
 
     def _test_f(
         self,
@@ -463,11 +529,13 @@ class TestCaseCS2D(TestCaseCSBase, unittest.TestCase):
         self,
         src: CS,
         dst: CS,
-        color: npt.ArrayLike,
-        ref: npt.ArrayLike,
+        color0: npt.ArrayLike,
+        color1: npt.ArrayLike,
+        ref0: npt.ArrayLike,
+        ref1: npt.ArrayLike,
     ):
-        res_2d = convert(src, dst, color=[color, color])
-        np.testing.assert_almost_equal(res_2d, [ref, ref], decimal=4)
+        res_2d = convert(src, dst, color=[color0, color1])
+        np.testing.assert_almost_equal(res_2d, [ref0, ref1], decimal=4)
 
     def _test_f(
         self,
@@ -484,14 +552,18 @@ class TestCaseCS3D(TestCaseCSBase, unittest.TestCase):
         self,
         src: CS,
         dst: CS,
-        color: npt.ArrayLike,
-        ref: npt.ArrayLike,
+        color0: npt.ArrayLike,
+        color1: npt.ArrayLike,
+        ref0: npt.ArrayLike,
+        ref1: npt.ArrayLike,
     ):
         res_3d = convert(
-            src, dst, color=[[color, color, color], [color, color, color]]
+            src,
+            dst,
+            color=[[color0, color0, color1], [color1, color0, color1]],
         )
         np.testing.assert_almost_equal(
-            res_3d, [[ref, ref, ref], [ref, ref, ref]], decimal=4
+            res_3d, [[ref0, ref0, ref1], [ref1, ref0, ref1]], decimal=4
         )
 
     def _test_f(

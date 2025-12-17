@@ -151,7 +151,7 @@ class PCS23UCS(CS):
 
     def _convert(self, color: FArray) -> FArray:
         xyY = CIExyY().from_XYZ(self, color)
-        x, y, Y = xyY.T
+        x, y, Y = xyY.reshape(-1, 3).T
         x = x.reshape(-1)
         y = y.reshape(-1)
         Y = Y.reshape(-1)
