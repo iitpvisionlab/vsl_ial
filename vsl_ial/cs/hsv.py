@@ -10,16 +10,16 @@ class HSV(CS):
     """
 
     def from_sRGB(self, src: CS, color: FArray) -> FArray:
-        h, l, s = HLS().from_sRGB(src, color).T
+        h, l, s = HLS().from_sRGB(src, color.reshape(-1, 3)).T
         v = l + s * np.minimum(l, 1.0 - l)
         s = 2 * (1.0 - np.divide(l, v, where=v != 0, out=np.ones_like(v)))
         return np.dstack((h, s, v)).reshape(color.shape)
 
     def to_sRGB(self, src: CS, color: FArray) -> FArray:
-        h, s, v = color.T
+        h, s, v = color.reshape(-1, 3).T
         l = v * (1.0 - s / 2.0)
         minl = np.minimum(l, 1.0 - l)
         s = np.divide(
             (v - l), minl, where=minl != 0.0, out=np.zeros_like(minl)
         )
-        return HLS().to_sRGB(self, np.dstack((h, l, s)).reshape(color.shape))
+        return HLS().to_sRGB(self, np.dstack((h, l, s))).reshape(color.shape)

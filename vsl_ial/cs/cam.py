@@ -327,7 +327,7 @@ class _CAMBase(CS):
         return np.array([J_, M_ * np.cos(h), M_ * np.sin(h)]).T
 
     def to_XYZ(self, dst: CS, color: FArray):
-        J_, a, b = color.T
+        J_, a, b = color.reshape(-1, 3).T
         J = -J_ / (self.c1 * (J_ - 1) - 1)
         h = np.mod(np.arctan2(b, a), np.pi * 2.0)
         M_ = np.hypot(a, b)

@@ -41,7 +41,7 @@ class HLS(CS):
         return np.dstack((hue, l, saturation)).reshape(color.shape)
 
     def to_sRGB(self, src: CS, color: FArray) -> FArray:
-        h, l, s = color.T
+        h, l, s = color.reshape(-1, 3).T
         m2 = np.where(l <= 0.5, l * (1.0 + s), l + s - (l * s))
         m1 = 2.0 * l - m2
 
