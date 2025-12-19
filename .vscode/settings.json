@@ -1,5 +1,11 @@
 {
     "cSpell.words": [
-        "hstack"
+        "combvd",
+        "hstack",
+        "linalg",
+        "Munsell",
+        "newaxis",
+        "tensordot",
+        "whitepoints"
     ]
 }
