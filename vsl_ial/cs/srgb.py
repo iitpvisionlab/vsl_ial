@@ -32,7 +32,6 @@ class sRGB(CS):
         return color_clipped
 
     def from_XYZ(self, src: CS, color: FArray) -> FArray:
-        assert src.__class__.__name__ == "XYZ"
         linrgb = linRGB(self._illuminant_xyz)
         color = linrgb.from_XYZ(src, color)
         return self.from_linRGB(linrgb, color)
