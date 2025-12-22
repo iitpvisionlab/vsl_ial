@@ -470,6 +470,15 @@ class TestCaseCSBase:
             ref1=[0.8073134397, -1.63216626, -0.2843612585],
         )
 
+        self._test(
+            XYZ(),
+            PCS23UCS(illuminant_xyz=None, F_LA_or_D=0.8),
+            color0=[0.12412, 0.07493, 0.3093],
+            color1=[0.36171007855, 0.7172837833, 0.11938578030],
+            ref0=[0.23037445, 0.44758013, -0.11761058],
+            ref1=[0.79310326, -1.746337, -0.39712248],
+        )
+
     def test_cat02(self):
         from vsl_ial.cs.cam import CAT02
 
