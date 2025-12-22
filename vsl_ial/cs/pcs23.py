@@ -51,6 +51,10 @@ class PCS23UCS(CS):
     Main differences are:
     * input XYZ range [0, 1], and not [0, 100];
     * output range [-1, 1], and not [-100, 100].
+
+    Details:
+    * `illuminant_xyz` can be `None`. When it is `None`, chromatic adaptation
+      step is disabled
     """
 
     DEFAULT_V = (
@@ -109,7 +113,7 @@ class PCS23UCS(CS):
     def __init__(
         self,
         F_LA_or_D: tuple[float, float] | float,
-        illuminant_xyz: FArray = whitepoints_cie1964.D65,
+        illuminant_xyz: FArray | None = whitepoints_cie1964.D65,
         V: tuple[float, ...] = DEFAULT_V,
         H: tuple[float, ...] = DEFAULT_H,
     ):
@@ -125,10 +129,14 @@ class PCS23UCS(CS):
             )
         )
         E = np.array((0.01, 0.01, 0.01))
-        self._cat16 = CAT16(
-            illuminant_src=illuminant_xyz,
-            illuminant_dst=E,
-            F_LA_or_D=F_LA_or_D,
+        self._cat16 = (
+            None
+            if illuminant_xyz is None
+            else CAT16(
+                illuminant_src=illuminant_xyz,
+                illuminant_dst=E,
+                F_LA_or_D=F_LA_or_D,
+            )
         )
         self._white_point = self._convert(E)
 
@@ -137,7 +145,8 @@ class PCS23UCS(CS):
         return h / h[-1]
 
     def from_XYZ(self, src: CS, color: FArray) -> FArray:
-        color = self._cat16(color)
+        if self._cat16 is not None:
+            color = self._cat16(color)
         raw_pcones = self._convert(color)
         k = 1.0 / np.linalg.norm(self._white_point)
         scaled_pcones = k * raw_pcones
