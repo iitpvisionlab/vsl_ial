@@ -112,7 +112,7 @@ class PCS23UCS(CS):
 
     def __init__(
         self,
-        F_LA_or_D: tuple[float, float] | float,
+        F_LA_or_D: tuple[float, float] | float | None,
         illuminant_xyz: FArray | None = whitepoints_cie1964.D65,
         V: tuple[float, ...] = DEFAULT_V,
         H: tuple[float, ...] = DEFAULT_H,
@@ -161,9 +161,6 @@ class PCS23UCS(CS):
     def _convert(self, color: FArray) -> FArray:
         xyY = CIExyY().from_XYZ(self, color)
         x, y, Y = xyY.reshape(-1, 3).T
-        x = x.reshape(-1)
-        y = y.reshape(-1)
-        Y = Y.reshape(-1)
         Y *= 100.0
         yY = np.divide(y, Y, where=Y != 0, out=np.zeros_like(Y))
         x_sq = np.square(x)
