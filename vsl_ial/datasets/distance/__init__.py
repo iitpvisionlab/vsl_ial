@@ -21,7 +21,7 @@ class DistanceDataset(NamedTuple):
     c: float  # the impact of surround
     Nc: float | None  # achromatic induction factor
     F: float | None  # actor for degree of adaptation
-    illuminant: tuple[float, float, float]
+    illuminant: np.ndarray[tuple[Literal[3]], np.dtype[np.float64]]
     xyz: np.ndarray[tuple[int, Literal[3]], np.dtype[np.float64]]
     pairs: list[tuple[int, int]]
     dv: np.ndarray[tuple[int], np.dtype[np.float64]]
@@ -36,10 +36,11 @@ class DistanceDataset(NamedTuple):
             L_A=data["L_A"],
             Y_b=data["Y_b"],
             c=data["c"],
-            Nc=None,
+            Nc=data.get("Nc"),
             F=data.get("F"),
-            illuminant=data["reference_white"],
-            xyz=np.array(data["xyz"], dtype=np.float64),
+            illuminant=np.array(data["reference_white"], dtype=np.float64)
+            * 0.01,
+            xyz=np.array(data["xyz"], dtype=np.float64) * 0.01,
             pairs=data["pairs"],
             dv=np.array(data["dv"], dtype=np.float64),
         )
@@ -132,34 +133,6 @@ WhereFunction: TypeAlias = Callable[
 ]
 
 
-class MunsellConst(NamedTuple):
-    const: Literal["HV", "VC", "HC"]
-    match: Literal["any"] | MunsellLimit | list[MunsellHue]
-
-    def create(self) -> WhereFunction:
-        check: Callable[[int | MunsellHue], bool]
-        match self.match:
-            case MunsellLimit() as lim:
-                check = lim.__contains__
-            case "any":
-                check = lambda _: True
-            case list() as hues:
-                check = lambda hue: hue in hues
-            case _:
-                raise ValueError(f"Unsupported match {self.match}")
-
-        def f(const: Literal["HC", "VC", "HV"], row: MunsellRow) -> bool:
-            if const != self.const:
-                return False
-            if const == "HC":
-                return check(row.V)
-            if const == "HV":
-                return check(row.C)
-            return check(row.H_hue)
-
-        return f
-
-
 class MunsellContains(NamedTuple):
     hue: Sequence[MunsellHue] = ()
     chroma: Sequence[int] | MunsellLimit = ()
@@ -168,12 +141,31 @@ class MunsellContains(NamedTuple):
     def create(self) -> WhereFunction:
         return self.check
 
-    def check(self, const: Literal["HC", "VC", "HV"], row: MunsellRow) -> bool:
+    def check(self, group: Literal["HC", "VC", "HV"], row: MunsellRow) -> bool:
         return (
             (not self.hue or row.H_hue in self.hue)
             and (not self.value or row.V in self.value)
             and (not self.chroma or row.C in self.chroma)
         )
+
+
+class MunsellGroup(NamedTuple):
+    group: Literal["HV", "VC", "HC"]
+    match: Literal["any"] | MunsellContains = "any"
+
+    def create(self) -> WhereFunction:
+        if self.match == "any":
+
+            def f(group: Literal["HC", "VC", "HV"], row: MunsellRow) -> bool:
+                return group == self.group
+
+        else:
+            check: WhereFunction = self.match.check
+
+            def f(group: Literal["HC", "VC", "HV"], row: MunsellRow) -> bool:
+                return group == self.group and check(group, row)
+
+        return f
 
 
 class load_munsell:
@@ -197,12 +189,12 @@ class load_munsell:
 
     @staticmethod
     def create_query(
-        conditions: list[MunsellContains | MunsellConst],
+        conditions: list[MunsellContains | MunsellGroup],
     ) -> WhereFunction:
         if not conditions:
             return lambda _1, _2: True
         fns = [condition.create() for condition in conditions]
-        return lambda const, row: all(fn(const, row) for fn in fns)
+        return lambda group, row: any(fn(group, row) for fn in fns)
 
     @staticmethod
     def key_v(row: MunsellRow):
@@ -215,7 +207,8 @@ class load_munsell:
     def __new__(
         cls,
         where: WhereFunction | None = None,
-        version: Literal["2.0", "3.2", "3.3"] = "3.3",
+        version: Literal["2.0", "3.0", "3.1.0", "3.1.1", "3.2", "3.3"] = "3.3",
+        min_subset_size: int = 2,
     ):
         from collections import defaultdict
 
@@ -240,7 +233,7 @@ class load_munsell:
 
         ret: list[DistanceDataset] = []
         for key, group in groups.items():
-            if len(group) > 1:
+            if len(group) >= min_subset_size:
                 group.sort(key=key[1])
                 ret.append(cls.group_as_dataset(f"{version}-{key[0]}", group))
         return ret
@@ -252,10 +245,10 @@ class load_munsell:
 
         n = len(rows) - 1
 
-        xyy = np.asarray(
+        xyY = np.asarray(
             [(row.x, row.y, row.Y) for row in rows], dtype=np.float64
         )
-        xyz = CIExyY(None).to_XYZ(None, xyy)
+        xyz = CIExyY(None).to_XYZ(None, xyY)
 
         return DistanceDataset(
             name=f"munsell-{key}",
@@ -264,7 +257,7 @@ class load_munsell:
             c=0.69,
             Nc=1.0,
             F=1.0,
-            illuminant=whitepoints_cie1931.C.tolist(),
+            illuminant=whitepoints_cie1931.C,
             dv=np.full(shape=(n,), fill_value=np.float64(1.0)),
             pairs=list(zip(range(n), range(1, n + 1))),
             xyz=xyz,

@@ -3,7 +3,7 @@ from unittest import TestCase
 from vsl_ial.datasets.sensitivities import load as load_sensitivities
 from vsl_ial.datasets.distance import (
     load_munsell,
-    MunsellConst,
+    MunsellGroup,
     MunsellContains,
     MunsellLimit,
     load_bfd_p,
@@ -55,7 +55,12 @@ class TestLoadMunsell(TestCase):
         dataset = load_munsell(
             version="3.3",
             where=load_munsell.create_query(
-                [MunsellConst(const="HC", match=MunsellLimit(max=0))]
+                [
+                    MunsellGroup(
+                        group="HC",
+                        match=MunsellContains(value=MunsellLimit(max=0)),
+                    )
+                ]
             ),
         )
         self.assertEqual(len(dataset), 0)
@@ -64,7 +69,7 @@ class TestLoadMunsell(TestCase):
         dataset = load_munsell(
             version="3.3",
             where=load_munsell.create_query(
-                [MunsellConst(const="HC", match="any")]
+                [MunsellGroup(group="HC", match="any")]
             ),
         )
         self.assertEqual(len(dataset), 422)
@@ -72,7 +77,7 @@ class TestLoadMunsell(TestCase):
         dataset = load_munsell(
             version="3.3",
             where=load_munsell.create_query(
-                [MunsellConst(const="VC", match="any")]
+                [MunsellGroup(group="VC", match="any")]
             ),
         )
         self.assertEqual(len(dataset), 133)
@@ -80,7 +85,7 @@ class TestLoadMunsell(TestCase):
         dataset = load_munsell(
             version="3.3",
             where=load_munsell.create_query(
-                [MunsellConst(const="HV", match="any")]
+                [MunsellGroup(group="HV", match="any")]
             ),
         )
         self.assertEqual(len(dataset), 397)
@@ -91,7 +96,12 @@ class TestLoadMunsell(TestCase):
         dataset = load_munsell(
             version="3.3",
             where=load_munsell.create_query(
-                [MunsellConst(const="HC", match=MunsellLimit(max=5))]
+                [
+                    MunsellGroup(
+                        group="HC",
+                        match=MunsellContains(value=MunsellLimit(max=5)),
+                    )
+                ]
             ),
         )
         self.assertEqual(len(dataset), 358)
@@ -99,7 +109,12 @@ class TestLoadMunsell(TestCase):
         dataset = load_munsell(
             version="3.3",
             where=load_munsell.create_query(
-                [MunsellConst(const="HC", match=MunsellLimit(min=6))]
+                [
+                    MunsellGroup(
+                        group="HC",
+                        match=MunsellContains(value=MunsellLimit(min=6)),
+                    )
+                ]
             ),
         )
         self.assertEqual(len(dataset), 358)
@@ -108,7 +123,12 @@ class TestLoadMunsell(TestCase):
         dataset = load_munsell(
             version="3.3",
             where=load_munsell.create_query(
-                [MunsellConst(const="HV", match=MunsellLimit(max=5))]
+                [
+                    MunsellGroup(
+                        group="HV",
+                        match=MunsellContains(chroma=MunsellLimit(max=5)),
+                    )
+                ]
             ),
         )
         self.assertEqual(len(dataset), 396)
@@ -116,7 +136,12 @@ class TestLoadMunsell(TestCase):
         dataset = load_munsell(
             version="3.3",
             where=load_munsell.create_query(
-                [MunsellConst(const="HV", match=MunsellLimit(min=6))]
+                [
+                    MunsellGroup(
+                        group="HV",
+                        match=MunsellContains(chroma=MunsellLimit(min=6)),
+                    )
+                ]
             ),
         )
         self.assertEqual(len(dataset), 328)
@@ -125,7 +150,12 @@ class TestLoadMunsell(TestCase):
         dataset = load_munsell(
             version="3.3",
             where=load_munsell.create_query(
-                [MunsellConst(const="VC", match=["B", "BG", "G", "GY", "P"])]
+                [
+                    MunsellGroup(
+                        group="VC",
+                        match=MunsellContains(hue=["B", "BG", "G", "GY", "P"]),
+                    )
+                ]
             ),
         )
         self.assertEqual(len(dataset), 127)
@@ -133,7 +163,14 @@ class TestLoadMunsell(TestCase):
         dataset = load_munsell(
             version="3.3",
             where=load_munsell.create_query(
-                [MunsellConst(const="VC", match=["PB", "R", "RP", "Y", "YR"])]
+                [
+                    MunsellGroup(
+                        group="VC",
+                        match=MunsellContains(
+                            hue=["PB", "R", "RP", "Y", "YR"]
+                        ),
+                    )
+                ]
             ),
         )
         self.assertEqual(len(dataset), 109)
@@ -143,11 +180,12 @@ class TestLoadMunsell(TestCase):
             version="3.3",
             where=load_munsell.create_query(
                 [
-                    MunsellConst(
-                        const="VC", match=["B", "BG", "G", "GY", "P"]
+                    MunsellGroup(
+                        group="VC",
+                        match=MunsellContains(hue=["B", "BG", "G", "GY", "P"]),
                     ),
-                    MunsellContains(chroma=[8, 10, 12, 2, 4, 6, 22, 18]),
+                    MunsellContains(chroma=[8, 10, 18]),
                 ]
             ),
         )
-        self.assertEqual(len(dataset), 78)
+        self.assertEqual(len(dataset), 543)
