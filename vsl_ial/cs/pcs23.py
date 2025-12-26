@@ -48,9 +48,9 @@ class PCS23UCS(CS):
     2024, vol. 15193, ISSN 0302-9743, ISBN 978-3-031-72844-0, no 15193,
     pp. 36-50, 2025, DOI: 10.1007/978-3-031-72845-7_3.
 
-    Main differences are:
-    * input XYZ range [0, 1], and not [0, 100];
-    * output range [-1, 1], and not [-100, 100].
+    There are no differences in values compared to original article:
+    * input XYZ range is [0, 1]
+    * output range is [-100, 100].
 
     Details:
     * `illuminant_xyz` can be `None`. When it is `None`, chromatic adaptation
@@ -161,7 +161,6 @@ class PCS23UCS(CS):
     def _convert(self, color: FArray) -> FArray:
         xyY = CIExyY().from_XYZ(self, color)
         x, y, Y = xyY.reshape(-1, 3).T
-        Y *= 100.0
         yY = np.divide(y, Y, where=Y != 0, out=np.zeros_like(Y))
         x_sq = np.square(x)
         y_sq = np.square(y)
