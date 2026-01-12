@@ -11,9 +11,14 @@ description = "Color spaces made reasonable"
 requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+readme = "README.md"
+license = "MIT"
+[project.urls]
+"Homepage" = "https://github.com/iitpvisionlab/vls_ial"
+"Bug Reports" = "https://github.com/iitpvisionlab/vls_ial/issues"
+"Source" = "https://github.com/iitpvisionlab/vls_ial"
 [build-system]
 requires = [
   "wheel",
