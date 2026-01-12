@@ -19,8 +19,8 @@ class DistanceDataset(NamedTuple):
     L_A: float  # the relative tristimulus values of the sample in the source condition
     Y_b: float
     c: float  # the impact of surround
-    Nc: float | None  # achromatic induction factor
-    F: float | None  # actor for degree of adaptation
+    Nc: float  # achromatic induction factor
+    F: float  # actor for degree of adaptation
     illuminant: np.ndarray[tuple[Literal[3]], np.dtype[np.float64]]
     xyz: np.ndarray[tuple[int, Literal[3]], np.dtype[np.float64]]
     pairs: list[tuple[int, int]]
