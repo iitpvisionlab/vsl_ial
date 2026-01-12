@@ -16,8 +16,8 @@ classifiers = [
 ]
 [build-system]
 requires = [
-  "setuptools",
   "wheel",
+  "setuptools-scm",
 ]
 [tool.setuptools.dynamic]
 version = {attr = "vsl_ial.__version__"}
