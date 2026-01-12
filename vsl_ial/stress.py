@@ -27,7 +27,7 @@ def calc_k(a: FArray, b: FArray, ord: Ord) -> Float:
 
 
 def stress(a: FArray, b: FArray, ord: Ord = 2) -> Float:
-    assert a.ndim == b.ndim == 1
+    assert a.ndim == b.ndim == 1, (a.shape, b.shape)
     return norm(calc_k(a, b, ord) * a - b, ord) / norm(b, ord)
 
 
