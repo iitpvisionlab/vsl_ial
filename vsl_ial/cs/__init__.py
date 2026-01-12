@@ -45,11 +45,10 @@ class CS:
         try:
             from_func = getattr(self, f"from_{src.__class__.__name__}")
         except AttributeError:
+            type_self = self.__class__
             try:
-                to_func = getattr(src, f"to_{self.__class__.__name__}")
+                to_func = getattr(src, f"to_{type_self.__name__}")
             except AttributeError:
-                type_self = self.__class__
-
                 # same color - do nothing
                 if type(src) is type_self:
                     return color
