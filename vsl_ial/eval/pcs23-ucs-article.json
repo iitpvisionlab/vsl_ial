@@ -1,0 +1,90 @@
+{
+    "cs": [
+        {
+            "name": "CAM16-SCD"
+        },
+        {
+            "name": "CAM16-UCS"
+        },
+        {
+            "name": "CAM16-LCD"
+        },
+        {
+            "name": "CAM02-SCD"
+        },
+        {
+            "name": "CAM02-UCS"
+        },
+        {
+            "name": "CAM02-LCD"
+        },
+        {
+            "name": "PCS23-UCS"
+        },
+        {
+            "name": "CIELAB"
+        },
+        {
+            "name": "ProLab"
+        },
+        {
+            "name": "Oklab"
+        },
+        {
+            "name": "JzAzBz"
+        }
+    ],
+    "datasets": [
+        {
+            "name": "combvd"
+        },
+        {
+            "name": "bfd_p",
+            "subsets": [
+                "d65"
+            ]
+        },
+        {
+            "name": "bfd_p",
+            "subsets": [
+                "m"
+            ]
+        },
+        {
+            "name": "bfd_p",
+            "subsets": [
+                "c"
+            ]
+        },
+        {
+            "name": "rit_dupont"
+        },
+        {
+            "name": "witt"
+        },
+        {
+            "name": "leeds"
+        },
+        {
+            "name": "munsell",
+            "version": "3.1.0",
+            "where": [
+                {
+                    "group": "HC",
+                    "match": {
+                        "chroma": {
+                            "min": 18,
+                            "max": 32
+                        }
+                    }
+                }
+            ],
+            "min_subset_size": 3
+        }
+    ],
+    "metrics": [
+        {
+            "name": "group_stress"
+        }
+    ]
+}
