@@ -15,6 +15,7 @@ classifiers = [
 ]
 readme = "README.md"
 license = "MIT"
+dependencies = ["numpy"]
 [project.urls]
 "Homepage" = "https://github.com/iitpvisionlab/vls_ial"
 "Bug Reports" = "https://github.com/iitpvisionlab/vls_ial/issues"
@@ -24,6 +25,8 @@ requires = [
   "wheel",
   "setuptools-scm",
 ]
+[project.optional-dependencies]
+extra = ["rich", "json5", "pydantic"]
 [tool.setuptools.dynamic]
 version = {attr = "vsl_ial.__version__"}
 [tool.black]
