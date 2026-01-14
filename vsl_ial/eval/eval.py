@@ -28,7 +28,7 @@ def evaluate(model: CS, dataset: DistanceDataset):
     return ref_distance, exp_distance
 
 
-def main():
+def main(console: Console | None = None):
     default_config_path = Path(__file__).with_name("pcs23-ucs-article.json")
     parser = ArgumentParser()
     parser.add_argument("--config", type=Path, default=default_config_path)
@@ -50,7 +50,7 @@ def main():
     # cs_classes = [cs.load() for cs in config.cs]
     datasets_loaded = [dataset.load() for dataset in config.datasets]
 
-    console = Console()
+    console = console or Console()
     for metric in config.metrics:
         # evaluation
         # make row for each color coordinate system
