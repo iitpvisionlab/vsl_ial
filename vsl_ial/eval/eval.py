@@ -5,11 +5,20 @@ import numpy as np
 from rich.table import Table
 from rich.console import Console
 import json5
-from vsl_ial.cs.xyz import XYZ
-from vsl_ial.cs import CS
-from vsl_ial import FArray
-from .config import Config
+from ..cs.xyz import XYZ
+from ..cs import CS
+from .. import FArray
 from ..datasets.distance import DistanceDataset
+from .dataset import DatasetConfig
+from .metrics import Metrics
+from .cs import CS as CSModel
+from ._base import StrictModel
+
+
+class Config(StrictModel):
+    datasets: list[DatasetConfig]
+    cs: list[CSModel]
+    metrics: list[Metrics]
 
 
 def evaluate(model: CS, dataset: DistanceDataset):

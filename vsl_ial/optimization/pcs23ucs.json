@@ -1,0 +1,28 @@
+{
+    "datasets": [
+        {
+            "name": "combvd",
+            "weight": 1.0
+        },
+        {
+            "name": "munsell",
+            "weight": 0.8,
+            "version": "3.1.0",
+            "where": [
+                {
+                    "group": "HC",
+                    "match": {
+                        "chroma": {
+                            "min": 18,
+                            "max": 32
+                        }
+                    }
+                }
+            ],
+            "min_subset_size": 3
+        }
+    ],
+    "loss": {
+        "name": "group_stress"
+    }
+}
