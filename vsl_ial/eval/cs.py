@@ -174,6 +174,24 @@ class JzAzBz(StrictModel):
         return JzAzBz()
 
 
+class ICaCb(StrictModel):
+    name: Literal["ICaCb"]
+
+    def create_for(self, dataset: DistanceDataset):
+        from ..cs.icacb import ICaCb
+
+        return ICaCb()
+
+
+class ICtCp(StrictModel):
+    name: Literal["ICtCp"]
+
+    def create_for(self, dataset: DistanceDataset):
+        from ..cs.ictcp import ICtCp
+
+        return ICtCp()
+
+
 CS = Annotated[
     CAM02LCD
     | CAM02SCD
@@ -182,7 +200,9 @@ CS = Annotated[
     | CAM16SCD
     | CAM16UCS
     | CIELAB
-    | Debug
+    | Debug  # Debug is here, but not int the list by default
+    | ICaCb
+    | ICtCp
     | JzAzBz
     | Oklab
     | PCS23UCS
