@@ -4,7 +4,7 @@ Comprehensive color solutions: CAM16, CAT16, and CAM16-UCS
 
 from __future__ import annotations
 from abc import abstractmethod
-from . import CS, convert, FArray
+from . import CS, convert, FArray, Ord
 from typing import Tuple, Union, NamedTuple, ClassVar
 import numpy as np
 
@@ -337,7 +337,7 @@ class _CAMBase(CS):
             self._cam, dst, np.dstack([J, M, h]).reshape(color.shape)
         )
 
-    def distance(self, a: FArray, b: FArray, ord=None) -> float:
+    def distance(self, a: FArray, b: FArray, ord: Ord = None) -> float:
         diff = np.divide(a - b, [self.k, 1.0, 1.0])
         return np.linalg.norm(diff, ord=ord, axis=a.ndim - 1)
 

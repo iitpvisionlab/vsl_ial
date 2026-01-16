@@ -1,6 +1,6 @@
 from __future__ import annotations
 import importlib
-from typing import Optional, Literal
+from typing import Literal, TypeAlias
 import numpy.typing as npt
 import numpy as np
 from .. import FArray
@@ -35,10 +35,11 @@ class whitepoints_cie1964:
 
 
 D65 = whitepoints_cie1931.D65
+Ord: TypeAlias = float | Literal["fro", "nuc"] | None
 
 
 class CS:
-    def __init__(self, illuminant_xyz: Optional[FArray] = None):
+    def __init__(self, illuminant_xyz: FArray | None = None):
         self._illuminant_xyz = illuminant_xyz
 
     def convert(self, src: CS, color: FArray) -> FArray:
@@ -75,7 +76,7 @@ class CS:
         else:
             return from_func(src, color)
 
-    def distance(self, a: FArray, b: FArray, ord=None) -> float:
+    def distance(self, a: FArray, b: FArray, ord: Ord = None) -> float:
         return np.linalg.norm(a - b, ord=ord, axis=a.ndim - 1)
 
 
