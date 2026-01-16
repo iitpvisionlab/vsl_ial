@@ -32,7 +32,7 @@ def evaluate(model: CS, dataset: DistanceDataset):
     for idx, (a_idx, b_idx) in enumerate(dataset.pairs):
         a_colors[idx] = model_coordinates[a_idx]
         b_colors[idx] = model_coordinates[b_idx]
-    exp_distance = np.linalg.norm(a_colors - b_colors, axis=1, ord=2)
+    exp_distance = model.distance(a_colors, b_colors)
     ref_distance = dataset.dv
     return ref_distance, exp_distance
 
