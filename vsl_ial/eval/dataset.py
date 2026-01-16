@@ -101,7 +101,8 @@ class DatasetMunsell(BaseDataset):
 
     @property
     def display_name(self):
-        return f"Munsell-{self.version}"
+        custom = self.where or self.min_subset_size != 2
+        return f"Munsell-{self.version}{'*' if custom else ''}"
 
 
 class DatasetRit_dupont(BaseDataset):
