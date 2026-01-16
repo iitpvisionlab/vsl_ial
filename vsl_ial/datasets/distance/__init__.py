@@ -246,7 +246,7 @@ class load_munsell:
         n = len(rows) - 1
 
         xyY = np.asarray(
-            [(row.x, row.y, row.Y) for row in rows], dtype=np.float64
+            [(row.x, row.y, row.Y * 0.01) for row in rows], dtype=np.float64
         )
         xyz = CIExyY(None).to_XYZ(None, xyY)
 
