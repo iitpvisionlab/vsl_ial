@@ -48,19 +48,19 @@
         {
             "name": "bfd_p",
             "subsets": [
-                "d65"
+                "D65"
             ]
         },
         {
             "name": "bfd_p",
             "subsets": [
-                "m"
+                "M"
             ]
         },
         {
             "name": "bfd_p",
             "subsets": [
-                "c"
+                "C"
             ]
         },
         {
