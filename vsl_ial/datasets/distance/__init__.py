@@ -5,6 +5,8 @@ from typing import (
     Callable,
     TypeAlias,
     Sequence,
+    Iterator,
+    TypeVar,
 )
 from pathlib import Path
 import json
@@ -12,6 +14,8 @@ import numpy as np
 
 
 dataset_root = Path(__file__).parent
+
+T = TypeVar("T")
 
 
 class DistanceDataset(NamedTuple):
@@ -188,6 +192,15 @@ class load_munsell:
         return order(row.H_hue), row.H_value
 
     @staticmethod
+    def key_h_next(h: tuple[int, int]):
+        h_index, h_value = h
+        if h_value != 10.0:
+            return h_index, h_value + 2.5
+        if h_index != 9:
+            return h_index + 1.0, 2.5
+        return 0, 2.5  # wrap
+
+    @staticmethod
     def create_query(
         conditions: list[MunsellContains | MunsellGroup],
     ) -> WhereFunction:
@@ -201,8 +214,43 @@ class load_munsell:
         return row.V
 
     @staticmethod
+    def key_v_next(V: int):
+        return V + 1
+
+    @staticmethod
     def key_c(row: MunsellRow):
         return row.C
+
+    @staticmethod
+    def key_c_next(C: int):
+        return C + 2
+
+    @staticmethod
+    def split_rows(
+        rows: list[MunsellRow],
+        get_key: Callable[[MunsellRow], T],
+        next_key: Callable[[T], T],
+    ) -> Iterator[list[MunsellRow]]:
+        it = iter(rows)
+        prev_row = next(it)
+        first_key = prev_key = get_key(prev_row)
+        first_group = cur_group = [prev_row]
+        for row in it:
+            key = get_key(row)
+            if next_key(prev_key) == key:
+                cur_group.append(row)
+            else:
+                yield cur_group
+                cur_group = [row]
+            prev_row, prev_key = row, key
+        if next_key(prev_key) == first_key:
+            if first_group is cur_group:
+                first_group.append(rows[0])
+                yield cur_group
+            else:
+                first_group[:0] = cur_group
+        else:
+            yield cur_group
 
     def __new__(
         cls,
@@ -212,41 +260,70 @@ class load_munsell:
     ):
         from collections import defaultdict
 
-        Key = tuple[str, Callable[[MunsellRow], int | tuple[int, float]]]
-
         version_d = version.replace(".", "-")
         csv = (
             dataset_root / "order" / "mrr-revised" / f"munsell_{version_d}.csv"
         )
-        groups = defaultdict[Key, list[MunsellRow]](list)
+        groups_hv = defaultdict[str, list[MunsellRow]](list)
+        groups_vc = defaultdict[str, list[MunsellRow]](list)
+        groups_hc = defaultdict[str, list[MunsellRow]](list)
 
         with csv.open() as f:
             next(f)
             for line in f:
                 row = MunsellRow.from_line(line)
                 if where is None or where("HV", row):
-                    groups[(f"h={row.H}_v={row.V}", cls.key_c)].append(row)
+                    groups_hv[f"h={row.H}_v={row.V}"].append(row)
                 if row.C != 0 and (where is None or where("VC", row)):
-                    groups[(f"v={row.V}_c={row.C}", cls.key_h)].append(row)
+                    groups_vc[f"v={row.V}_c={row.C}"].append(row)
                 if where is None or where("HC", row):
-                    groups[(f"h={row.H}_c={row.C}", cls.key_v)].append(row)
+                    groups_hc[f"h={row.H}_c={row.C}"].append(row)
 
         ret: list[DistanceDataset] = []
-        for key, group in groups.items():
-            if len(group) >= min_subset_size:
-                group.sort(key=key[1])
-                ret.append(cls.group_as_dataset(f"{version}-{key[0]}", group))
+        for groups, key, key_next in (
+            (groups_hv, cls.key_c, cls.key_c_next),
+            (groups_vc, cls.key_h, cls.key_h_next),
+            (groups_hc, cls.key_v, cls.key_v_next),
+        ):
+            for name, group in groups.items():
+                group.sort(key=key)
+                subsets: list[list[MunsellRow]] = []
+                for group in list(cls.split_rows(group, key, key_next)):
+                    subsets.append(group)
+                if subsets:
+                    if (
+                        sum(len(subset) for subset in subsets)
+                        > min_subset_size
+                    ):  # filter by number of pairs. > and not >= !
+                        ret.append(
+                            cls.subsets_as_dataset(
+                                f"{version}-{name}", subsets
+                            )
+                        )
         return ret
 
     @staticmethod
-    def group_as_dataset(key: str, rows: list[MunsellRow]) -> DistanceDataset:
+    def subsets_as_dataset(
+        key: str, subsets: list[list[MunsellRow]]
+    ) -> DistanceDataset:
         from vsl_ial.cs import whitepoints_cie1931
         from vsl_ial.cs.ciexyy import CIExyY
 
-        n = len(rows) - 1
+        pairs: list[tuple[int, int]] = []
+        shift = 0
+        for rows in subsets:
+            n = len(rows)
+            pairs.extend(
+                zip(
+                    range(shift + 0, shift + n - 1),
+                    range(shift + 1, shift + n),
+                )
+            )
+            shift += len(rows)
 
         xyY = np.asarray(
-            [(row.x, row.y, row.Y * 0.01) for row in rows], dtype=np.float64
+            [(row.x, row.y, row.Y * 0.01) for rows in subsets for row in rows],
+            dtype=np.float64,
         )
         xyz = CIExyY(None).to_XYZ(None, xyY)
 
@@ -258,7 +335,8 @@ class load_munsell:
             Nc=1.0,
             F=1.0,
             illuminant=whitepoints_cie1931.C,
-            dv=np.full(shape=(n,), fill_value=np.float64(1.0)),
-            pairs=list(zip(range(n), range(1, n + 1))),
+            # 1.0 is a perceptive step, we don't know its exact value
+            dv=np.full(shape=(len(pairs),), fill_value=np.float64(1.0)),
+            pairs=pairs,
             xyz=xyz,
         )

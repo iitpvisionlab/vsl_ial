@@ -43,13 +43,13 @@ class TestLoadDistances(TestCase):
 
 class TestLoadMunsell(TestCase):
     def test_load_2_0(self):
-        self.assertEqual(len(load_munsell(version="2.0")), 910)
+        self.assertEqual(len(load_munsell(version="2.0")), 854)
 
     def test_load_3_2(self):
-        self.assertEqual(len(load_munsell(version="3.2")), 952)
+        self.assertEqual(len(load_munsell(version="3.2")), 887)
 
     def test_load_3_3(self):
-        self.assertEqual(len(load_munsell(version="3.3")), 952)
+        self.assertEqual(len(load_munsell(version="3.3")), 887)
 
     def test_where_0(self):
         dataset = load_munsell(
@@ -72,7 +72,7 @@ class TestLoadMunsell(TestCase):
                 [MunsellGroup(group="HC", match="any")]
             ),
         )
-        self.assertEqual(len(dataset), 422)
+        self.assertEqual(len(dataset), 393)
 
         dataset = load_munsell(
             version="3.3",
@@ -80,7 +80,7 @@ class TestLoadMunsell(TestCase):
                 [MunsellGroup(group="VC", match="any")]
             ),
         )
-        self.assertEqual(len(dataset), 133)
+        self.assertEqual(len(dataset), 122)
 
         dataset = load_munsell(
             version="3.3",
@@ -88,7 +88,7 @@ class TestLoadMunsell(TestCase):
                 [MunsellGroup(group="HV", match="any")]
             ),
         )
-        self.assertEqual(len(dataset), 397)
+        self.assertEqual(len(dataset), 372)
 
         assert 422 + 133 + 397 == 952
 
@@ -104,7 +104,7 @@ class TestLoadMunsell(TestCase):
                 ]
             ),
         )
-        self.assertEqual(len(dataset), 358)
+        self.assertEqual(len(dataset), 314)
 
         dataset = load_munsell(
             version="3.3",
@@ -117,7 +117,7 @@ class TestLoadMunsell(TestCase):
                 ]
             ),
         )
-        self.assertEqual(len(dataset), 358)
+        self.assertEqual(len(dataset), 290)
 
     def test_where_hv_limit(self):
         dataset = load_munsell(
@@ -131,7 +131,7 @@ class TestLoadMunsell(TestCase):
                 ]
             ),
         )
-        self.assertEqual(len(dataset), 396)
+        self.assertEqual(len(dataset), 99)
 
         dataset = load_munsell(
             version="3.3",
@@ -144,7 +144,7 @@ class TestLoadMunsell(TestCase):
                 ]
             ),
         )
-        self.assertEqual(len(dataset), 328)
+        self.assertEqual(len(dataset), 304)
 
     def test_where_vc_limit(self):
         dataset = load_munsell(
@@ -158,7 +158,7 @@ class TestLoadMunsell(TestCase):
                 ]
             ),
         )
-        self.assertEqual(len(dataset), 127)
+        self.assertEqual(len(dataset), 117)
 
         dataset = load_munsell(
             version="3.3",
@@ -173,7 +173,7 @@ class TestLoadMunsell(TestCase):
                 ]
             ),
         )
-        self.assertEqual(len(dataset), 109)
+        self.assertEqual(len(dataset), 104)
 
     def test_where_vc_contains(self):
         dataset = load_munsell(
@@ -188,29 +188,29 @@ class TestLoadMunsell(TestCase):
                 ]
             ),
         )
-        self.assertEqual(len(dataset), 543)
+        self.assertEqual(len(dataset), 361)
 
 
 class TestEval(TestCase):
     REF = (
-        "                                            group_stress                                            \n"
-        "┏━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━┓\n"
-        "┃           ┃ COMBVD ┃ BFD-P d65 ┃ BFD-P m ┃ BFD-P c ┃ RIT-DuPont ┃ Witt  ┃ Leeds ┃ Munsell-3.1.0* ┃\n"
-        "┡━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━┩\n"
-        "│ CAM16-SCD │ 0.295  │ 0.254     │ 0.346   │ 0.283   │ 0.237      │ 0.306 │ 0.219 │ 0.0871         │\n"
-        "│ CAM16-UCS │ 0.305  │ 0.271     │ 0.35    │ 0.297   │ 0.206      │ 0.31  │ 0.245 │ 0.0883         │\n"
-        "│ CAM16-LCD │ 0.339  │ 0.311     │ 0.372   │ 0.366   │ 0.214      │ 0.372 │ 0.292 │ 0.107          │\n"
-        "│ CAM02-SCD │ 0.296  │ 0.266     │ 0.338   │ 0.303   │ 0.244      │ 0.303 │ 0.221 │ 0.111          │\n"
-        "│ CAM02-UCS │ 0.306  │ 0.28      │ 0.343   │ 0.321   │ 0.213      │ 0.305 │ 0.246 │ 0.116          │\n"
-        "│ CAM02-LCD │ 0.339  │ 0.318     │ 0.366   │ 0.404   │ 0.223      │ 0.366 │ 0.296 │ 0.169          │\n"
-        "│ PCS23-UCS │ 0.311  │ 0.289     │ 0.325   │ 0.379   │ 0.3        │ 0.381 │ 0.332 │ 0.0741         │\n"
-        "│ CIELAB    │ 0.426  │ 0.41      │ 0.433   │ 0.543   │ 0.334      │ 0.517 │ 0.401 │ 0.281          │\n"
-        "│ ProLab    │ 0.441  │ 0.451     │ 0.429   │ 0.485   │ 0.302      │ 0.519 │ 0.394 │ 0.177          │\n"
-        "│ Oklab     │ 0.471  │ 0.515     │ 0.424   │ 0.416   │ 0.318      │ 0.452 │ 0.45  │ 0.074          │\n"
-        "│ JzAzBz    │ 0.418  │ 0.404     │ 0.424   │ 0.494   │ 0.385      │ 0.474 │ 0.451 │ 0.127          │\n"
-        "│ ICaCb     │ 0.391  │ 0.396     │ 0.38    │ 0.424   │ 0.248      │ 0.474 │ 0.373 │ 0.14           │\n"
-        "│ ICtCp     │ 0.463  │ 0.481     │ 0.441   │ 0.636   │ 0.423      │ 0.559 │ 0.397 │ 0.228          │\n"
-        "└───────────┴────────┴───────────┴─────────┴─────────┴────────────┴───────┴───────┴────────────────┘\n"
+        "                                          group_stress                                           \n"
+        "┏━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━┓\n"
+        "┃           ┃ COMBVD ┃ BFD-P d65 ┃ BFD-P m ┃ BFD-P c ┃ RIT-DuPont ┃ Witt  ┃ Leeds ┃ Munsell-3.3 ┃\n"
+        "┡━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━┩\n"
+        "│ CAM16-SCD │ 0.295  │ 0.254     │ 0.346   │ 0.283   │ 0.237      │ 0.306 │ 0.219 │ 0.218       │\n"
+        "│ CAM16-UCS │ 0.305  │ 0.271     │ 0.35    │ 0.297   │ 0.206      │ 0.31  │ 0.245 │ 0.205       │\n"
+        "│ CAM16-LCD │ 0.339  │ 0.311     │ 0.372   │ 0.366   │ 0.214      │ 0.372 │ 0.292 │ 0.217       │\n"
+        "│ CAM02-SCD │ 0.296  │ 0.266     │ 0.338   │ 0.303   │ 0.244      │ 0.303 │ 0.221 │ 0.266       │\n"
+        "│ CAM02-UCS │ 0.306  │ 0.28      │ 0.343   │ 0.321   │ 0.213      │ 0.305 │ 0.246 │ 0.267       │\n"
+        "│ CAM02-LCD │ 0.339  │ 0.318     │ 0.366   │ 0.404   │ 0.223      │ 0.366 │ 0.296 │ 0.333       │\n"
+        "│ PCS23-UCS │ 0.311  │ 0.289     │ 0.325   │ 0.379   │ 0.3        │ 0.381 │ 0.332 │ 0.253       │\n"
+        "│ CIELAB    │ 0.426  │ 0.41      │ 0.433   │ 0.543   │ 0.334      │ 0.517 │ 0.401 │ 0.308       │\n"
+        "│ ProLab    │ 0.441  │ 0.451     │ 0.429   │ 0.485   │ 0.302      │ 0.519 │ 0.394 │ 0.289       │\n"
+        "│ Oklab     │ 0.471  │ 0.515     │ 0.424   │ 0.416   │ 0.318      │ 0.452 │ 0.45  │ 0.132       │\n"
+        "│ JzAzBz    │ 0.418  │ 0.404     │ 0.424   │ 0.494   │ 0.385      │ 0.474 │ 0.451 │ 0.244       │\n"
+        "│ ICaCb     │ 0.391  │ 0.396     │ 0.38    │ 0.424   │ 0.248      │ 0.474 │ 0.373 │ 0.192       │\n"
+        "│ ICtCp     │ 0.463  │ 0.481     │ 0.441   │ 0.636   │ 0.423      │ 0.559 │ 0.397 │ 0.34        │\n"
+        "└───────────┴────────┴───────────┴─────────┴─────────┴────────────┴───────┴───────┴─────────────┘\n"
         "Legend: Best Second Best\n"
     )
 
