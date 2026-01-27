@@ -5,6 +5,12 @@
                 "vsl_ial/eval/*.json"
             ],
             "url": "./vsl_ial/eval/schema.json"
+        },
+        {
+            "fileMatch": [
+                "vsl_ial/optimization/*.json"
+            ],
+            "url": "./vsl_ial/optimization/schema.json"
         }
     ],
     "cSpell.words": [
