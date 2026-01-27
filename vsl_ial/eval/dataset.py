@@ -31,11 +31,11 @@ class BaseDataset(StrictModel):
 
 class DatasetBfd_p(BaseDataset):
     name: Literal["bfd_p"] = "bfd_p"
-    subsets: list[Literal["c", "d65", "m"]] = ["c", "d65", "m"]
+    subsets: list[Literal["C", "D65", "M"]] = ["C", "D65", "M"]
 
     def load(self) -> WeightedDataset:
         return WeightedDataset(
-            datasets=load_bfd_p(subsets=self.subsets),
+            datasets=load_bfd_p(subsets=[i.lower() for i in self.subsets]),
             weight=self.weight,
             name=self.name,
         )
