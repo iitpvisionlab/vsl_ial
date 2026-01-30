@@ -45,18 +45,6 @@ class DatasetBfd_p(BaseDataset):
         return f"BFD-P {', '.join(self.subsets)}"
 
 
-class DatasetFairchild_chen(BaseDataset):
-    name: Literal["fairchild_chen"]
-
-
-class DatasetHung_berns(BaseDataset):
-    name: Literal["hung_berns"]
-
-
-class DatasetIlluminants(BaseDataset):
-    name: Literal["illuminants"]
-
-
 class DatasetLeeds(BaseDataset):
     name: Literal["leeds"] = "leeds"
     display_name: ClassVar[str] = "Leeds"
@@ -65,21 +53,6 @@ class DatasetLeeds(BaseDataset):
         return WeightedDataset(
             datasets=load_leeds(), weight=self.weight, name=self.name
         )
-
-
-class DatasetLuo_rigg(BaseDataset):
-    name: Literal["luo_rigg"]
-    display_name: ClassVar[str] = "Luo Rigg"
-
-
-class DatasetMacadam_1942(BaseDataset):
-    name: Literal["macadam_1942"]
-    display_name: ClassVar[str] = "MacAdam 1942"
-
-
-class DatasetMacadam_1974(BaseDataset):
-    name: Literal["macadam_1974"]
-    display_name: ClassVar[str] = "MacAdam 1974"
 
 
 class DatasetMunsell(BaseDataset):
@@ -142,13 +115,7 @@ class DatasetCombvd(BaseDataset):
 DatasetConfig = Annotated[
     DatasetBfd_p
     | DatasetCombvd
-    | DatasetFairchild_chen
-    | DatasetHung_berns
-    | DatasetIlluminants
     | DatasetLeeds
-    | DatasetLuo_rigg
-    | DatasetMacadam_1942
-    | DatasetMacadam_1974
     | DatasetMunsell
     | DatasetRit_dupont
     | DatasetWitt,
