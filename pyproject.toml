@@ -20,11 +20,6 @@ dependencies = ["numpy"]
 "Homepage" = "https://github.com/iitpvisionlab/vls_ial"
 "Bug Reports" = "https://github.com/iitpvisionlab/vls_ial/issues"
 "Source" = "https://github.com/iitpvisionlab/vls_ial"
-[build-system]
-requires = [
-  "wheel",
-  "setuptools-scm",
-]
 [project.optional-dependencies]
 extra = ["rich", "json5", "pydantic"]
 [tool.setuptools.dynamic]
