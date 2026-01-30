@@ -122,7 +122,7 @@ class MunsellRow(NamedTuple):
         H_hue = H[idx:]
         return cls(
             H=H,
-            H_hue=H_hue,
+            H_hue=H_hue,  # type: ignore
             H_value=H_value,
             V=int(V),
             C=int(C),

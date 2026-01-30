@@ -53,7 +53,7 @@ def main(console: Console | None = None):
         print(f"{schema_path} updated")
         return
 
-    config = Config(**json5.loads(args.config.read_text()))
+    config = Config(**json5.loads(args.config.read_text()))  # type: ignore
 
     # metrics_loaded = [metric.load() for metric in config.metrics]
     # cs_classes = [cs.load() for cs in config.cs]
