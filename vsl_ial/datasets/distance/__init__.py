@@ -287,19 +287,13 @@ class load_munsell:
         ):
             for name, group in groups.items():
                 group.sort(key=key)
-                subsets: list[list[MunsellRow]] = []
-                for group in list(cls.split_rows(group, key, key_next)):
-                    subsets.append(group)
-                if subsets:
-                    if (
-                        sum(len(subset) for subset in subsets)
-                        > min_subset_size
-                    ):  # filter by number of pairs. > and not >= !
-                        ret.append(
-                            cls.subsets_as_dataset(
-                                f"{version}-{name}", subsets
-                            )
-                        )
+                subsets = list(cls.split_rows(group, key, key_next))
+                if subsets and (
+                    sum(len(subset) for subset in subsets) > min_subset_size
+                ):  # filter by number of pairs. > and not >= !
+                    ret.append(
+                        cls.subsets_as_dataset(f"{version}-{name}", subsets)
+                    )
         return ret
 
     @staticmethod
