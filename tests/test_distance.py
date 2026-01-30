@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import TypeAlias
 import unittest
 from vsl_ial.cs import (
     distance,
@@ -8,36 +10,46 @@ from vsl_ial.cs import (
 from vsl_ial.cs.cielab import CIELAB
 from vsl_ial.cs.cam import Average
 import numpy as np
-import numpy.typing as npt
+
+Color: TypeAlias = tuple[float, float, float]
 
 
 class TestCaseDistanceBase:
+    def _test(
+        self,
+        cs: CS,
+        color1: Color,
+        color2: Color,
+        ref: float,
+    ) -> None:
+        raise NotImplementedError
+
     def test_XYZ(self):
         self._test(
-            XYZ(), [0.12412, 0.07493, 0.3093], [0.12412, 0.07493, 0.3093], 0.0
+            XYZ(), (0.12412, 0.07493, 0.3093), (0.12412, 0.07493, 0.3093), 0.0
         )
 
         ref = (0.12412**2 + 0.42507**2 + 0.4907**2) ** 0.5
-        self._test(XYZ(), [0.12412, 0.07493, 0.3093], [0.0, 0.5, 0.8], ref)
+        self._test(XYZ(), (0.12412, 0.07493, 0.3093), (0.0, 0.5, 0.8), ref)
 
     def test_CAM16LCD_distance(self):
         from vsl_ial.cs.cam import CAM16LCD
 
         cs = CAM16LCD(illuminant_xyz=D65, L_A=60.0, Y_b=20.0, surround=Average)
         self._test(
-            cs, [0.12412, 0.07493, 0.3093], [0.12412, 0.07493, 0.3093], 0.0
+            cs, (0.12412, 0.07493, 0.3093), (0.12412, 0.07493, 0.3093), 0.0
         )
 
         ref = ((0.12412 / 0.77) ** 2 + 0.42507**2 + 0.4907**2) ** 0.5
-        self._test(cs, [0.12412, 0.07493, 0.3093], [0.0, 0.5, 0.8], ref)
+        self._test(cs, (0.12412, 0.07493, 0.3093), (0.0, 0.5, 0.8), ref)
 
 
 class TestCaseDistance1D(TestCaseDistanceBase, unittest.TestCase):
     def _test(
         self,
         cs: CS,
-        color1: npt.ArrayLike,
-        color2: npt.ArrayLike,
+        color1: Color,
+        color2: Color,
         ref: float,
     ):
         res_1d = distance(cs, color1=color1, color2=color2)
@@ -48,8 +60,8 @@ class TestCaseDistance2D(TestCaseDistanceBase, unittest.TestCase):
     def _test(
         self,
         cs: CS,
-        color1: npt.ArrayLike,
-        color2: npt.ArrayLike,
+        color1: Color,
+        color2: Color,
         ref: float,
     ):
         res_2d = distance(cs, color1=[color1, color1], color2=[color2, color2])
@@ -60,8 +72,8 @@ class TestCaseDistance3D(TestCaseDistanceBase, unittest.TestCase):
     def _test(
         self,
         cs: CS,
-        color1: npt.ArrayLike,
-        color2: npt.ArrayLike,
+        color1: Color,
+        color2: Color,
         ref: float,
     ):
         res_2d = distance(

@@ -27,9 +27,9 @@ class Statistics(NamedTuple):
     def create(cls, metric_image: FArray):
         return cls(
             metric_image=metric_image,
-            mean=np.mean(metric_image),
-            max=np.max(metric_image),
-            std=np.std(metric_image),
+            mean=float(np.mean(metric_image)),
+            max=float(np.max(metric_image)),
+            std=float(np.std(metric_image)),
         )
 
 

@@ -257,7 +257,7 @@ class _CATBase:
         illuminant_dst: FArray,
         F_LA_or_D: tuple[float, float] | float,
         exact: bool = True,
-    ):
+    ) -> None:
         D_RGB = CAMCommon.calc_d_rgb(
             self.M, illuminant_src, illuminant_dst, F_LA_or_D
         )
@@ -267,7 +267,7 @@ class _CATBase:
             else (self.M_INV @ (self.M.T * D_RGB).T).T
         )
 
-    def __call__(self, xyz: FArray):
+    def __call__(self, xyz: FArray) -> FArray:
         return xyz @ self._M
 
 
