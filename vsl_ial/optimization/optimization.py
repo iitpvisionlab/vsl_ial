@@ -16,7 +16,7 @@ from vsl_ial.cs.srgb import sRGB
 from vsl_ial.cs.linrgb import linRGB
 from vsl_ial.cs.ciexyy import CIExyY
 from vsl_ial.cs import convert
-import viser
+# import viser
 
 from ..eval._base import StrictModel
 from ..eval.dataset import DatasetConfig, WeightedDataset
@@ -35,7 +35,7 @@ LossFunction: TypeAlias = Callable[
     [Sequence[FArray], Sequence[FArray], Ord], Float
 ]
 
-server = viser.ViserServer()
+# server = viser.ViserServer()
 
 
 def _point_inside(x: float, y: float, poly: list[tuple[float, float]]):
@@ -109,7 +109,7 @@ class MonotonicityLoss:
         """
         self.visualize_PCS23 = res = cs.from_XYZ(XYZ(), self.XYZ_diff)
         minimum_diff = 0.02
-        L_plus = res[..., 2]
+        L_plus = res[..., 0]
         θ = float(
             np.mean(
                 np.maximum(
@@ -157,32 +157,32 @@ def train(
         .reshape(-1, 3)
     )
 
-    server.scene.add_point_cloud(
-        name="/sensitivity",
-        points=monotonicity_loss._sensitivity_xyz,
-        colors=RGB_colors,
-        point_size=0.03,
-    )
+    # server.scene.add_point_cloud(
+    #     name="/sensitivity",
+    #     points=monotonicity_loss._sensitivity_xyz,
+    #     colors=RGB_colors,
+    #     point_size=0.03,
+    # )
 
-    DBG = monotonicity_loss.XYZ_diff
-    DBG = DBG[len(DBG) // 2]
-    x, y, _ = (
-        DBG.reshape(-1, 3) / np.sum(DBG.reshape(-1, 3), axis=-1)[:, None]
-    ).T
-    xyY = np.column_stack((x, y, np.full_like(x, fill_value=0.4)))
+    # DBG = monotonicity_loss.XYZ_diff
+    # DBG = DBG[len(DBG) // 2]
+    # x, y, _ = (
+    #     DBG.reshape(-1, 3) / np.sum(DBG.reshape(-1, 3), axis=-1)[:, None]
+    # ).T
+    # xyY = np.column_stack((x, y, np.full_like(x, fill_value=0.4)))
 
-    RGB_colors_2 = convert(
-        src=CIExyY(),
-        dst=linRGB(),
-        color=DBG.reshape(-1, 3),
-    )
+    # RGB_colors_2 = convert(
+    #     src=CIExyY(),
+    #     dst=linRGB(),
+    #     color=DBG.reshape(-1, 3),
+    # )
 
-    server.scene.add_point_cloud(
-        name="/XYZ_diff",
-        points=xyY,
-        colors=RGB_colors_2,
-        point_size=0.01,
-    )
+    # server.scene.add_point_cloud(
+    #     name="/XYZ_diff",
+    #     points=xyY,
+    #     colors=RGB_colors_2,
+    #     point_size=0.01,
+    # )
 
     def evaluate(x: list[float]) -> float:
 
@@ -207,7 +207,7 @@ def train(
                 srgb, xyz = create_sRGB_grid(50)
                 pc_coordinates = model.from_XYZ(XYZ(), xyz)
 
-                from matplotlib import pyplot as plt
+                # from matplotlib import pyplot as plt
 
                 if False:
                     from vsl_ial.cs.cielab import CIELAB
@@ -266,7 +266,6 @@ def train(
                 exp_distance = np.linalg.norm(
                     a_colors - b_colors, axis=1, ord=2
                 )
-                breakpoint()
                 exp.append(exp_distance)
                 ref.append(dataset.dv)
                 # print(f"{dataset.name} -> {len(dataset.pairs)}")
@@ -281,19 +280,19 @@ def train(
         # visualize
         #
 
-        vis_pcs23 = opt_model.from_XYZ(
-            XYZ(), monotonicity_loss._sensitivity_xyz
-        )
-        server.scene.add_point_cloud(
-            name="/pcs23",
-            points=vis_pcs23,
-            colors=RGB_colors,
-            point_size=0.03,
-        )
+        # vis_pcs23 = opt_model.from_XYZ(
+        #     XYZ(), monotonicity_loss._sensitivity_xyz
+        # )
+        # server.scene.add_point_cloud(
+        #     name="/pcs23",
+        #     points=vis_pcs23,
+        #     colors=RGB_colors,
+        #     point_size=0.03,
+        # )
         return loss
 
     # x0 = [0.2] * (39 + 8)
-    # x0 = np.random.rand(39 + 8)
+    x0 = np.random.rand(39 + 8)
     # x0 = np.asarray(
     #     [
     #         5.62377545903092,
@@ -347,8 +346,8 @@ def train(
     # )
     # np.random.shuffle(x0)
     # x0 = -x0 + (x0 + 1) * 0.2
-    x0 = np.array(PCS23UCS.DEFAULT_V + PCS23UCS.DEFAULT_H)
-    for i in range(5):
+    # x0 = np.array(PCS23UCS.DEFAULT_V + PCS23UCS.DEFAULT_H)
+    for i in range(60):
         res = minimize(
             fun=evaluate,
             method="Nelder-Mead",
