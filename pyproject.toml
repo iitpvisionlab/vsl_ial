@@ -17,9 +17,9 @@ readme = "README.md"
 license = "MIT"
 dependencies = ["numpy"]
 [project.urls]
-"Homepage" = "https://github.com/iitpvisionlab/vls_ial"
-"Bug Reports" = "https://github.com/iitpvisionlab/vls_ial/issues"
-"Source" = "https://github.com/iitpvisionlab/vls_ial"
+"Homepage" = "https://github.com/iitpvisionlab/vsl_ial"
+"Bug Reports" = "https://github.com/iitpvisionlab/vsl_ial/issues"
+"Source" = "https://github.com/iitpvisionlab/vsl_ial"
 [project.optional-dependencies]
 extra = ["rich", "json5", "pydantic"]
 [tool.setuptools.dynamic]
