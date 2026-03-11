@@ -3,7 +3,6 @@ from . import CS, FArray
 import numpy as np
 import warnings
 
-
 LIN_RGB_MATRIX = np.array(
     (
         (3.2404542, -0.9692660, 0.0556434),

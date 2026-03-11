@@ -8,7 +8,6 @@ from . import CS, convert, FArray, Ord
 from typing import Tuple, Union, NamedTuple, ClassVar
 import numpy as np
 
-
 M_16 = np.array(
     (
         (+0.401288, +0.650173, -0.051461),

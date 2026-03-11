@@ -2,7 +2,6 @@ from __future__ import annotations
 from . import CS, FArray
 import numpy as np
 
-
 M_LMS = np.array(
     (
         (0.674207838, 0.149284160, 0.070941080),
