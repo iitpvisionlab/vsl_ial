@@ -23,4 +23,4 @@ jobs:
       - run: pip install -e '.[extra]'
       - name: unittest
         run: python -m unittest
-      - uses: psf/black@25.1.0
+      - uses: psf/black@26.3.0

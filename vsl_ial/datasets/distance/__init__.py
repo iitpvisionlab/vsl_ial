@@ -12,7 +12,6 @@ from pathlib import Path
 import json
 import numpy as np
 
-
 dataset_root = Path(__file__).parent
 
 T = TypeVar("T")

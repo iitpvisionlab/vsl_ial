@@ -11,7 +11,6 @@ from vsl_ial.stress import (
 )
 import numpy as np
 
-
 a = np.asarray(
     (1.3, 5.0, 10.0, 3.0, 0.12, 10.0, 32.4, 1, 8.0, 0.4, 0.454),
     dtype=np.float64,
