@@ -1,10 +1,7 @@
 from __future__ import annotations
-from pathlib import Path
-from argparse import ArgumentParser
 import numpy as np
 from rich.table import Table
 from rich.console import Console
-import json5
 from ..cs.xyz import XYZ
 from ..cs import CS
 from .. import FArray
@@ -37,26 +34,7 @@ def evaluate(model: CS, dataset: DistanceDataset):
     return ref_distance, exp_distance
 
 
-def main(console: Console | None = None):
-    default_config_path = Path(__file__).with_name("pcs23-ucs-article.json")
-    parser = ArgumentParser()
-    parser.add_argument("--config", type=Path, default=default_config_path)
-    parser.add_argument("--update-schema", action="store_true")
-    args = parser.parse_args()
-    if args.update_schema:
-        schema_path = Path(__file__).with_name("schema.json")
-        schema_path.write_text(
-            json5.dumps(
-                Config.model_json_schema(), ensure_ascii=False, quote_keys=True
-            )
-        )
-        print(f"{schema_path} updated")
-        return
-
-    config = Config(**json5.loads(args.config.read_text()))  # type: ignore
-
-    # metrics_loaded = [metric.load() for metric in config.metrics]
-    # cs_classes = [cs.load() for cs in config.cs]
+def main(config: Config, console: Console | None = None):
     datasets_loaded = [dataset.load() for dataset in config.datasets]
 
     console = console or Console()

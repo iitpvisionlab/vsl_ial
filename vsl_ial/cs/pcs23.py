@@ -207,3 +207,9 @@ class PCS23UCS(CS):
         visible color gamut if two conditions are met.
         """
         raise NotImplementedError()
+
+    def chromaticity(self, color: FArray) -> tuple[FArray, FArray]:
+        L, a, b = color.reshape(-1, 3).T
+        L_wp, a_wp, b_wp = self.from_XYZ(None, self._white_point)
+        a_wp, b_wp = a_wp / L_wp, b_wp / L_wp
+        return a / L - a_wp, b / L - b_wp

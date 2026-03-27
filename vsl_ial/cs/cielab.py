@@ -225,3 +225,8 @@ class CIELAB(CS):
         return np.abs(res.ΔL / (kL * res.Sl)) + np.hypot(
             res.ΔC / (kC * res.Sc), res.ΔH / (kH * res.Sh)
         )
+
+    @staticmethod
+    def chromaticity(color: FArray) -> tuple[FArray, FArray]:
+        L, a, b = color.reshape(-1, 3).T
+        return a / L, b / L

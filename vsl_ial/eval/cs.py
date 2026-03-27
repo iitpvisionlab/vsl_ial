@@ -1,10 +1,29 @@
 from __future__ import annotations
 
-from typing import Literal, Annotated, TypeAlias, TYPE_CHECKING
+from typing import (
+    Annotated,
+    Final,
+    Literal,
+    Protocol,
+    TYPE_CHECKING,
+    TypeAlias,
+)
 from pydantic import Field
 from ._base import StrictModel
-from ..datasets.distance import DistanceDataset
+
+# from ..datasets.distance import DistanceDataset
 from .. import FArray
+import numpy as np
+
+
+class SceneInfo(Protocol):
+    illuminant: Final[np.ndarray[tuple[Literal[3]], np.dtype[np.float64]]]
+    L_A: Final[float]
+    Y_b: Final[float]
+    F: Final[float]
+    c: Final[float]
+    Nc: Final[float]
+
 
 if TYPE_CHECKING:
     from ..cs.cam import (
@@ -22,17 +41,17 @@ if TYPE_CHECKING:
 
 
 class CAMBase(StrictModel):
-    def create_for(self, dataset: DistanceDataset):
+    def create_for(self, info: SceneInfo):
         from ..cs.cam import Surround
 
         return self.model(
-            illuminant_xyz=dataset.illuminant,
-            L_A=dataset.L_A,
-            Y_b=dataset.Y_b,
+            illuminant_xyz=info.illuminant,
+            L_A=info.L_A,
+            Y_b=info.Y_b,
             surround=Surround(
-                F=dataset.F,
-                c=dataset.c,
-                N_c=dataset.Nc,
+                F=info.F,
+                c=info.c,
+                N_c=info.Nc,
             ),
         )
 
@@ -54,21 +73,21 @@ class CAM16SCD(CAMBase):
 class Debug(StrictModel):
     name: Literal["CAM16SCD-color"]
 
-    def create_for(self, dataset: DistanceDataset):
+    def create_for(self, info: SceneInfo):
         from ..cs import CS
         import colour
 
         surround = colour.appearance.InductionFactors_CIECAM16(
-            F=dataset.F, c=dataset.c, N_c=dataset.Nc
+            F=info.F, c=info.c, N_c=info.Nc
         )
 
         class Debug(CS):
             def from_XYZ(self, src: CS, color: FArray) -> FArray:
                 cam16_scd = colour.XYZ_to_CAM16SCD(
                     color,
-                    XYZ_w=dataset.illuminant,
-                    L_A=dataset.L_A,
-                    Y_b=dataset.Y_b,
+                    XYZ_w=info.illuminant,
+                    L_A=info.L_A,
+                    Y_b=info.Y_b,
                     surround=surround,
                 )
                 return cam16_scd
@@ -129,46 +148,46 @@ class CAM02LCD(CAMBase):
 class PCS23UCS(StrictModel):
     name: Literal["PCS23-UCS"]
 
-    def create_for(self, dataset: DistanceDataset):
+    def create_for(self, info: SceneInfo):
         from ..cs.pcs23 import PCS23UCS
 
         return PCS23UCS(
-            F_LA_or_D=(dataset.F, dataset.L_A),
-            illuminant_xyz=dataset.illuminant,
+            F_LA_or_D=(info.F, info.L_A),
+            illuminant_xyz=info.illuminant,
         )
 
 
 class CIELAB(StrictModel):
     name: Literal["CIELAB"]
 
-    def create_for(self, dataset: DistanceDataset):
+    def create_for(self, info: SceneInfo):
         from ..cs.cielab import CIELAB
 
-        return CIELAB(illuminant_xyz=dataset.illuminant)
+        return CIELAB(illuminant_xyz=info.illuminant)
 
 
 class ProLab(StrictModel):
     name: Literal["ProLab"]
 
-    def create_for(self, dataset: DistanceDataset):
+    def create_for(self, info: SceneInfo):
         from ..cs.prolab import ProLab
 
-        return ProLab(illuminant_xyz=dataset.illuminant)
+        return ProLab(illuminant_xyz=info.illuminant)
 
 
 class Oklab(StrictModel):
     name: Literal["Oklab"]
 
-    def create_for(self, dataset: DistanceDataset):
+    def create_for(self, info: SceneInfo):
         from ..cs.oklab import Oklab
 
-        return Oklab(illuminant_xyz=dataset.illuminant)
+        return Oklab(illuminant_xyz=info.illuminant)
 
 
 class JzAzBz(StrictModel):
     name: Literal["JzAzBz"]
 
-    def create_for(self, dataset: DistanceDataset):
+    def create_for(self, info: SceneInfo):
         from ..cs.jzazbz import JzAzBz
 
         return JzAzBz()
@@ -177,7 +196,7 @@ class JzAzBz(StrictModel):
 class ICaCb(StrictModel):
     name: Literal["ICaCb"]
 
-    def create_for(self, dataset: DistanceDataset):
+    def create_for(self, info: SceneInfo):
         from ..cs.icacb import ICaCb
 
         return ICaCb()
@@ -186,7 +205,7 @@ class ICaCb(StrictModel):
 class ICtCp(StrictModel):
     name: Literal["ICtCp"]
 
-    def create_for(self, dataset: DistanceDataset):
+    def create_for(self, info: SceneInfo):
         from ..cs.ictcp import ICtCp
 
         return ICtCp()

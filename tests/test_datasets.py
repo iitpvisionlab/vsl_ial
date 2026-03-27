@@ -192,7 +192,7 @@ class TestLoadMunsell(TestCase):
 
 
 class TestEval(TestCase):
-    REF = (
+    REF_DISTANCE = (
         "                                          group_stress                                           \n"
         "┏━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━┓\n"
         "┃           ┃ COMBVD ┃ BFD-P D65 ┃ BFD-P M ┃ BFD-P C ┃ RIT-DuPont ┃ Witt  ┃ Leeds ┃ Munsell-3.3 ┃\n"
@@ -214,12 +214,44 @@ class TestEval(TestCase):
         "Legend: Best Second Best\n"
     )
 
-    def test_output(self):
-        from vsl_ial.eval.eval import main
+    REF_HUE_LINEARITY = (
+        "        UCS Hue Nonlinearity (SD units, lower is better).         \n"
+        "┏━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓\n"
+        "┃           ┃ Xiao et al. ┃ Ebner and Fairchild ┃ Hung and Berns ┃\n"
+        "┡━━━━━━━━━━━╇━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩\n"
+        "│ PCS23-UCS │ 1.823       │ 3.144               │ 3.696          │\n"
+        "│ ProLab    │ 2.886       │ 3.7                 │ 3.347          │\n"
+        "│ CIELAB    │ 2.67        │ 3.592               │ 3.754          │\n"
+        "│ CAM16-SCD │ 3.964       │ 3.964               │ 4.149          │\n"
+        "│ CAM16-UCS │ 3.964       │ 3.964               │ 4.149          │\n"
+        "└───────────┴─────────────┴─────────────────────┴────────────────┘\n"
+    )
+
+    def test_distance_output(self):
+        from vsl_ial.eval.__main__ import distance_command, DISTANCE_PATH
         from rich.console import Console
         from io import StringIO
 
         file = StringIO()
         console = Console(record=True, file=file, width=120)
-        main(console)
-        self.assertEqual(console.export_text(), self.REF)
+        distance_command(
+            config_path=DISTANCE_PATH, update_schema=False, console=console
+        )
+        self.assertEqual(console.export_text(), self.REF_DISTANCE)
+
+    def test_hue_linearity_output(self):
+        from vsl_ial.eval.__main__ import (
+            hue_linearity_command,
+            HUE_LINEARITY_PATH,
+        )
+        from rich.console import Console
+        from io import StringIO
+
+        file = StringIO()
+        console = Console(record=True, file=file, width=120)
+        hue_linearity_command(
+            config_path=HUE_LINEARITY_PATH,
+            update_schema=False,
+            console=console,
+        )
+        self.assertEqual(console.export_text(), self.REF_HUE_LINEARITY)

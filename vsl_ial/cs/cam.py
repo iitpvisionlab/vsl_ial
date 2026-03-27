@@ -340,6 +340,11 @@ class _CAMBase(CS):
         diff = np.divide(a - b, [self.k, 1.0, 1.0])
         return np.linalg.norm(diff, ord=ord, axis=a.ndim - 1)
 
+    @staticmethod
+    def chromaticity(color: FArray) -> tuple[FArray, FArray]:
+        L, a, b = color.reshape(-1, 3).T
+        return a / L, b / L
+
 
 class CAM16UCS(_CAMBase):
     c2 = 0.0228 * 100.0

@@ -1,0 +1,30 @@
+{
+    "cs": [
+        {
+            "name": "PCS23-UCS"
+        },
+        {
+            "name": "ProLab"
+        },
+        {
+            "name": "CIELAB"
+        },
+        {
+            "name": "CAM16-SCD"
+        },
+        {
+            "name": "CAM16-UCS"
+        }
+    ],
+    "datasets": [
+        {
+            "name": "xiao"
+        },
+        {
+            "name": "ebner_fairchild"
+        },
+        {
+            "name": "hung_berns"
+        }
+    ]
+}

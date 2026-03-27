@@ -2,9 +2,15 @@
     "json.schemas": [
         {
             "fileMatch": [
-                "vsl_ial/eval/*.json"
+                "vsl_ial/eval/distance-*.json"
             ],
-            "url": "./vsl_ial/eval/schema.json"
+            "url": "./vsl_ial/eval/distance_schema.json"
+        },
+        {
+            "fileMatch": [
+                "vsl_ial/eval/hue-linearity-*.json"
+            ],
+            "url": "./vsl_ial/eval/hue_linearity_schema.json"
         },
         {
             "fileMatch": [
@@ -22,6 +28,7 @@
         "newaxis",
         "Oklab",
         "tensordot",
-        "whitepoints"
+        "whitepoints",
+        "xiao"
     ]
 }

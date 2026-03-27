@@ -38,3 +38,8 @@ class ProLab(CS):
         y2 = np.tensordot(color, self.Q_inv, axes=1)
         xyz = y2.T / (1.0 - np.tensordot(y2, self.q, axes=1)).T
         return xyz.T * self._illuminant_xyz
+
+    @staticmethod
+    def chromaticity(color: FArray):
+        L, a, b = color.reshape(-1, 3).T
+        return a / L, b / L
